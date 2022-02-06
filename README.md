@@ -29,7 +29,7 @@
 
 ## 使用说明
     * (1) - 安装需要的第三方工具包：
-    ```shell
+    ```cmd
     # 工程根目录下执行安装脚本
     py install-script.py
     ```
@@ -39,7 +39,7 @@
     * (3) - \auto_clip_video_byandroid\video_action\ 目录下添加视频的 appiumn 自动化剪辑脚本，创建规则就按照目前已给的案例 -- 剧名/剧名+分季的数字；一般没有自己的特殊需求，只要复制已给的案例脚本，改一下文件名即可
 
     * (4) - 启动脚本
-    ```shell
+    ```cmd
     # 工程根目录下执行功能脚本，然后根据提示执行相应的功能
     py go_main_spider.py
     ```
@@ -47,17 +47,17 @@
     * (5) - 视频文件放置位置 和 自动分解和分段剪辑：
     * * 该操作必须确保已经配置好了视频的参数脚本（即 第(2)步操作）
     * * 在终端的第二段询问中，选择[5]选项，即可得到类似这样的目录 \downloadvideo\dsns\dsns1\fullvideo
-    ```shell
+    ```cmd
     [5] - 创建用于存放*完整*视频文件的目录（如果要上传发布的视频文件还没有放到该项目的指定目录下，则请先执行该操作）
     ```
     * * 把要进行分段剪辑视频放到这个 fullvideo 目录下，然后重新执行 py go_main_spider.py 
     * * 在终端的第二段询问中，选择[4]选项，即可得到类似这样的目录 \downloadvideo\dsns\dsns1\tsfiles\dsns1_01，即得到了视频文件被分解后的切片文件(.ts文件)
-    ```shell
+    ```cmd
     [4] - 视频分解（比如将 .mp4 视频文件分解成 .ts 切片文件，输出目录在 downloadvideo/ 目录下）
     ```
     * * 然后再重新执行 py go_main_spider.py 
     * * 再在第二段询问中，选择[1]选项，在随后的询问中，选择要分段剪辑的视频配置脚本，等待自动完成后，就会发现 \auto_clip_video_byandroid\ 目录下多了一个 video\ 目录，其中就有刚才分段剪辑好的视频文件
-    ```shell
+    ```cmd
     [1] - 视频分段剪辑
     ```
 
@@ -66,14 +66,15 @@
     * * 手机存储的根目录下新建一个文件夹命名为：autopy_for_bijian(即 这里\auto_clip_video_byandroid\config\upload_config_files 中配置脚本里的 mobile_storage_folder 变量值)，把 \auto_clip_video_byandroid\video\ 文件夹复制到这个 autopy_for_bijian 目录下【注：每次只复制本次需要的视频，目录结构一定与\auto_clip_video_byandroid\video\ 的保持一致，自动化脚本会根据这个结构进行查找手机存储里的视频文件，而且目前脚本功能不够强大，如果视频文件太多，会遇到找不到的情况】
     * * 启动 appiumn 客户端
     * * 执行 py go_main_spider.py 在终端的第二段询问中，选择[3]选项
-    ```shell
+    ```cmd
     [3] - 自动通过<必剪 app>上传分段视频
     ```
     * * 最后等待自动上传视频操作即可（初次使用时，appiumn会在手机上安装 appiumn 的 app）
+    ***（备注：在上传过程中，凡是通过脚本完成自动发布到B站的，都会在\auto_clip_video_byandroid\upload_rember\ 目录下存有记录，自动发布过程中凡是遇到异常问题的也会存有记录，只是记录带有 _error 后缀）***
 
     * (7) - 如果视频文件不需要分段，想直接使用自动上传功能
     * * 那么执行 py go_main_spider.py 后，第二段询问中，选择[6]选项，会根据配置参数脚本，在 \auto_clip_video_byandroid\ 目录下自动生成一个 video\dsns\dsns1\fullfiles\dsns1_01_01 类似这样的空文件夹，只需要把要上传的视频放到这样的文件夹下
-    ```shell
+    ```cmd
     [6] - 创建用于存放*分段*视频文件的目录（如果要上传发布的视频文件还没有放到该项目的指定目录下，则请先执行该操作）
     ```
     * * 让后再安装这个 video\dsns\dsns1\fullfiles\dsns1_01_01 目录结构，把视频也存放到手机存储的 autopy_for_bijian\ 目录下（即 第(6)步操作）
@@ -83,3 +84,6 @@
 
 ## 使用说明 -- 视频教程
     * 后续补上
+
+## 附加说明
+    * auto_clip_video_byandroid\logs\ 目录说明：在使用过程中终端打印的内容会也会在该目录下生成相应的 .log 日志文件，为了方便调试，如果不想输出，则修改 \auto_clip_video_byandroid\config\connection_config.py 中的 out_log_file 变量为 False 即可

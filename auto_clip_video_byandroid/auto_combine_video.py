@@ -32,6 +32,7 @@ import importlib
 import shutil
 import json
 from .combine_ts_by_ffmpeg import combine_ts_by_ffmpeg
+from .config.connection_config import out_log_file
 
 ''' ======================== 无限递归的解决方案 start ========================== '''
 # 这个值的大小取决你自己，最好适中即可，执行完递归再降低，毕竟递归深度太大，如果是其他未知的操作引起，可能会造成内存溢出
@@ -70,16 +71,17 @@ cur_timestamp = str(datetime.now().timestamp()).replace('.','')
 def log_print(str_content):
     # 在终端打印
     print(str_content)
-    # 输出到日志文件
-    logs_dir = '{0}auto_clip_video_byandroid/logs'.format(__ROOTPATH__)
-    if not os.path.exists(logs_dir):
-        os.makedirs(logs_dir)
-    # _log 前面改成当前的脚本文件名称
-    f_path = '{0}/auto_combine_video_log_{1}.log'.format(logs_dir,cur_timestamp)
-    # 写入文本
-    fp = open(f_path,"a",encoding="utf-8")
-    fp.write('{0}\n'.format(str_content))  
-    fp.close()
+    if out_log_file:
+        # 输出到日志文件
+        logs_dir = '{0}auto_clip_video_byandroid/logs'.format(__ROOTPATH__)
+        if not os.path.exists(logs_dir):
+            os.makedirs(logs_dir)
+        # _log 前面改成当前的脚本文件名称
+        f_path = '{0}/auto_combine_video_log_{1}.log'.format(logs_dir,cur_timestamp)
+        # 写入文本
+        fp = open(f_path,"a",encoding="utf-8")
+        fp.write('{0}\n'.format(str_content))  
+        fp.close()
 
 # @param rangstr: 范围字符串参数(格式如 '1:16')
 # @param str_len: 控制序号字符串的长度，不足会自动补零，如果这个参数不写，会默认保持最大值的字符串长度，不足自动补零

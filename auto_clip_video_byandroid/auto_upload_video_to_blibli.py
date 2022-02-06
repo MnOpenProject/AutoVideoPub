@@ -50,6 +50,7 @@ from .config.connection_config import config_server, config_desired_caps_bijian_
 from .auto_combine_video import del_files, video_root_path_name
 from .edit_action.insert_visual_role import start_create_by_virsual_role_channel
 from .edit_pubcover_action.main import main_func as edit_pubcover
+from .config.connection_config import out_log_file
 
 config_desired_caps = config_desired_caps_bijian_app
 
@@ -90,16 +91,17 @@ cur_timestamp = str(datetime.now().timestamp()).replace('.','')
 def log_print(str_content):
     # 在终端打印
     print(str_content)
-    # 输出到日志文件
-    logs_dir = '{0}auto_clip_video_byandroid/logs'.format(__ROOTPATH__)
-    if not os.path.exists(logs_dir):
-        os.makedirs(logs_dir)
-    # _log 前面改成当前的脚本文件名称
-    f_path = '{0}/auto_upload_video_to_blibli_log_{1}.log'.format(logs_dir,cur_timestamp)
-    # 写入文本
-    fp = open(f_path,"a",encoding="utf-8")
-    fp.write('{0}\n'.format(str_content))
-    fp.close()
+    if out_log_file:
+        # 输出到日志文件
+        logs_dir = '{0}auto_clip_video_byandroid/logs'.format(__ROOTPATH__)
+        if not os.path.exists(logs_dir):
+            os.makedirs(logs_dir)
+        # _log 前面改成当前的脚本文件名称
+        f_path = '{0}/auto_upload_video_to_blibli_log_{1}.log'.format(logs_dir,cur_timestamp)
+        # 写入文本
+        fp = open(f_path,"a",encoding="utf-8")
+        fp.write('{0}\n'.format(str_content))
+        fp.close()
 
 # 判断变量是否已定义
 def isset(v):

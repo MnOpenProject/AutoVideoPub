@@ -4,6 +4,9 @@ config_server = "http://localhost:4723/wd/hub"
 # ffmpeg 的 release 包的bin目录
 ffmpeg_bin_dir = 'C:/ffmpeg-5.0-essentials_build/bin'
 
+# 是否生成 .log 文件
+out_log_file = True
+
 # 通用配置：可以用于市场上的大多数机型（可以不用写 "deviceName" 这个属性）
 # 必剪 app 参数
 config_desired_caps_bijian_app = {
