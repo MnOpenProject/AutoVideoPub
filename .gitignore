@@ -1,0 +1,12 @@
+__pycache__
+downloadvideo
+browsermod-proxy
+tmp
+.idea
+log
+*.log
+
+# auto_clip_video_byandroid
+auto_clip_video_byandroid/video
+auto_clip_video_byandroid/logs
+auto_clip_video_byandroid/screen_shot
