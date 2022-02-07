@@ -189,6 +189,7 @@ def read_uploaded_remember_to_judge_isuploaded(upload_video_1th_name,upload_vide
     # txt记录文件已 视频的 一级名称命名
     remember_file_name = upload_video_1th_name
     f_path = '{0}/{1}.txt'.format(upload_rember_path,remember_file_name)
+    log_print('记录文件：{}'.format(f_path))
     if not os.path.exists(f_path):
         log_print('{} --> 不存在'.format(f_path))
         return False
@@ -286,8 +287,10 @@ def start_create():
         editor_tool_paster_position['val'] = result_params[1]
     else:
         # 点击按钮 <开始创作>
-        create_btn = driver.find_element(AppiumBy.ID, "{}card_video_clip".format(elementIdPrefix))
-        create_btn.click()
+        # create_btn = driver.find_element(AppiumBy.ID, "{}card_video_clip".format(elementIdPrefix))
+        # create_btn.click()
+        driver.tap([(392,473)],10)
+        force_sleep(2)
 
 ''' 开始通过 <必剪 app> 上传视频 '''
 def start_upload_video():
