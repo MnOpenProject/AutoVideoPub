@@ -279,6 +279,7 @@ def combine_video():
                 end_sec_total = end_time_h * 60 * 60 + end_time_m * 60 + end_time_s # 计算总秒数
                 end_index = int(end_sec_total / unit_ts_long_s)
                 end_index = start_index + 2 if end_index <= start_index else end_index
+                end_index = ts_file_list_len - 1 if end_index >= ts_file_list_len - 1 else end_index
                 log_print('总结束索引: {0}；对应的 .ts 文件为：\n{1}'.format(end_index,ts_file_list[end_index]))
 
                 file_count = end_index - start_index

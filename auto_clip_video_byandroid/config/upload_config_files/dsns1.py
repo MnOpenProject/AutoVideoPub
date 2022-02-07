@@ -23,7 +23,7 @@ paragraph_min_long_m = 1
 # 要上传哪几集
 # 拆解成数组方式：'01,02'.split(',') 
 # 目前支持两种写法：[1] '01,02,03,04,05'; [2] '1:5' 这表示范围 等同于第一种的效果
-upload_video_episode_list = '1:5'
+upload_video_episode_list = '01'
 first_name = 'dsns'
 second_name = 'dsns1'
 # 对相应视频进行处理的配置参数
@@ -49,9 +49,9 @@ video_file_config_list = [
     'paragraph': 3,
     # 每一段的时长（单位：分钟）(属性名最后的 m 代表单位是 分钟)
     # 【注：这只能是个大约的时间，最终生成的会有偏差】
-    'paragraph_long_m': 2.5,
+    'paragraph_long_m': 2,
     # 每一段剪辑视频的 间隔时长（单位：秒）
-    'paragraph_span': 60
+    'paragraph_span': 5
   }
 ]
 
@@ -72,7 +72,7 @@ video_upload_config_list = [
     # 拆解成数组方式：'03,04'.split(',') 
     # 目前支持两种写法：[1] '01,02,03,04,05'; [2] '1:5' 这表示范围 等同于第一种的效果
     # 'paragraph_serials':'01,02,03,04,05',
-    'paragraph_serials':'1:5',
+    'paragraph_serials':'1:3',
     # ------ <必剪 app> 导出画面里要填写的相关参数 start -----------
     # 分区
     'upload_channel': '生活,搞笑',

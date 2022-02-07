@@ -23,7 +23,8 @@ def main_func():
     '[3] - 自动通过<必剪 app>上传分段视频',
     '[4] - 视频分解（比如将 .mp4 视频文件分解成 .ts 切片文件，输出目录在 downloadvideo/ 目录下）',
     '[5] - 创建用于存放*完整*视频文件的目录（如果要上传发布的视频文件还没有放到该项目的指定目录下，则请先执行该操作）',
-    '[6] - 创建用于存放*分段*视频文件的目录（如果要上传发布的视频文件还没有放到该项目的指定目录下，则请先执行该操作）'
+    '[6] - 创建用于存放*分段*视频文件的目录（如果要上传发布的视频文件还没有放到该项目的指定目录下，则请先执行该操作）',
+    '[7] - 自动分解视频后，直接执行分段剪辑操作（即自动执行第 [4]+[1] 的操作）',
   ]
   print('请选择要操作的功能：(默认 [1])')
   for hint in hint_options:
@@ -79,3 +80,6 @@ def main_func():
     start_mkdir_full_video_folder(upload_config_module)
   elif user_selected == '6':
     start_mkdir_video_folder(upload_config_module)
+  elif user_selected == '7':
+    split_video_main_func(upload_config_module)
+    combine_main_func(upload_config_module)
