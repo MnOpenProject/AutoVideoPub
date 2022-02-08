@@ -46,11 +46,11 @@ import eventlet
 from PIL import Image
 
 from .config.connection_config import config_server, config_desired_caps_bijian_app
-# from .config.upload_config import mobile_storage_folder,video_file_config_list,video_upload_config_list
 from .auto_combine_video import del_files, video_root_path_name
 from .edit_action.insert_visual_role import start_create_by_virsual_role_channel
 from .edit_pubcover_action.main import main_func as edit_pubcover
 from .config.connection_config import out_log_file
+from .common.swipe_util import swipeDown
 
 config_desired_caps = config_desired_caps_bijian_app
 
@@ -309,8 +309,15 @@ def start_upload_video():
     inner_storage_item = driver.find_element(AppiumBy.ANDROID_UIAUTOMATOR,'new UiSelector().textContains("内部存储")')
     inner_storage_item.click()
     # 点击特定存放要上传的视频文件的 特定文件夹 的选项
-    video_folder_item = driver.find_element(AppiumBy.ANDROID_UIAUTOMATOR,'new UiSelector().textContains("{}")'.format(mobile_storage_folder))
-    video_folder_item.click()
+    for i in range(10):
+        try:
+            video_folder_item = driver.find_element(AppiumBy.ANDROID_UIAUTOMATOR,'new UiSelector().textContains("{}")'.format(mobile_storage_folder))
+            video_folder_item.click()
+            break
+        except Exception as ex:
+            # 若没找到对应的目录就下滑，再重新尝试查找
+            swipeDown(driver,100)
+            continue
     # [***] 正式开始 根据配置参数 选择视频文件，并进行编辑上传操作
     # [1] - 点击存放视频文件的 一级文件夹(即 auto_combine_video.py 最终输出的视频文件的文件夹)
     video_folder_root_item = driver.find_element(AppiumBy.ANDROID_UIAUTOMATOR,'new UiSelector().textContains("{}")'.format(video_root_path_name))
@@ -450,11 +457,15 @@ def start_upload_video():
                 try:
                     # --------- 进入视频编辑画面 -------------
                     log_print('\n------- 进入视频编辑画面，开始编辑视频 ------\n{0}\n'.format(video_show_file))
+                    # 视频文件的完整绝对路径
+                    video_show_file_dir = f'{video_show_files_path}/{video_show_file}'
+                    video_file_full_name = os.listdir(video_show_file_dir)[0]
+                    video_show_file_path = f'{video_show_file_dir}/{video_file_full_name}'
                     # [***] - (不同的视频可以对应不同的剪辑脚本)动态引入对应当前视频的剪辑操作模块，并调用其中的执行函数
                     # 动态引入脚本
                     edit_action_module_str = "auto_clip_video_byandroid.video_action.{0}.{1}".format(upload_video_1th_name,upload_video_2th_name)
                     edit_action_module = importlib.import_module(edit_action_module_str)
-                    edit_action_module.edit_video_action(log_print,driver,force_sleep,video_file_config_list,video_show_1th_name,video_show_2th_name,elementIdPrefix,video_show_file,editor_tool_audio_import_position['val'],editor_tool_paster_position['val'])
+                    edit_action_module.edit_video_action(log_print,driver,force_sleep,video_show_1th_name,video_show_2th_name,elementIdPrefix,video_show_file,editor_tool_audio_import_position['val'],editor_tool_paster_position['val'],video_show_file_path)
                     
                     # ------------------------- 发布视频 -------------
                     log_print('\n--------------------- 正在进行 【发布视频】 ------------------------\n')
@@ -1241,14 +1252,12 @@ def start_program():
 def start_mkdir_video_folder(upload_config_module):
     global upload_config_module_remember
     global mobile_storage_folder
-    global video_file_config_list
     global video_upload_config_list
     global action_type_selected
     global create_videw_type_selected
     
     upload_config_module_remember = upload_config_module
     mobile_storage_folder = upload_config_module.mobile_storage_folder
-    video_file_config_list = upload_config_module.video_file_config_list
     video_upload_config_list = upload_config_module.video_upload_config_list
     action_type_selected = {'val':None}
     create_videw_type_selected = {'val':None}
@@ -1258,14 +1267,12 @@ def start_mkdir_video_folder(upload_config_module):
 def start_mkdir_full_video_folder(upload_config_module):
     global upload_config_module_remember
     global mobile_storage_folder
-    global video_file_config_list
     global video_upload_config_list
     global action_type_selected
     global create_videw_type_selected
     
     upload_config_module_remember = upload_config_module
     mobile_storage_folder = upload_config_module.mobile_storage_folder
-    video_file_config_list = upload_config_module.video_file_config_list
     video_upload_config_list = upload_config_module.video_upload_config_list
     action_type_selected = {'val':None}
     create_videw_type_selected = {'val':None}
@@ -1276,14 +1283,12 @@ def start_mkdir_full_video_folder(upload_config_module):
 def main_func(upload_config_module):
     global upload_config_module_remember
     global mobile_storage_folder
-    global video_file_config_list
     global video_upload_config_list
     global action_type_selected
     global create_videw_type_selected
     
     upload_config_module_remember = upload_config_module
     mobile_storage_folder = upload_config_module.mobile_storage_folder
-    video_file_config_list = upload_config_module.video_file_config_list
     video_upload_config_list = upload_config_module.video_upload_config_list
     action_type_selected = {'val':None}
     create_videw_type_selected = {'val':None}

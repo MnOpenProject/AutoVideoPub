@@ -91,5 +91,5 @@ def edit_video_action(log_print,driver,force_sleep,video_show_1th_name,video_sho
     export_btn = driver.find_element(AppiumBy.ID, "{}tv_export".format(elementIdPrefix))
     export_btn.click()
     log_print('\n---------------- 点击<导出>，切换到<发布>画面，请等待片刻，待视频导出完成后，开始填写发布信息 ---------------\n')
-    wait_s = 50
+    wait_s = 120
     force_sleep(wait_s)

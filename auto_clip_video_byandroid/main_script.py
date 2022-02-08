@@ -4,6 +4,7 @@ from .auto_combine_video import main_func as combine_main_func
 from .auto_upload_video_to_blibli import main_func as upload_main_func,start_mkdir_full_video_folder,start_mkdir_video_folder
 from .move_video_to_mobile_storage import main_func as move_video_main_func
 from .auto_split_tsfiles import main_func as split_video_main_func
+from .auto_video_collection import main_func as video_collection_main_func
 
 # 判定是否为纯整数字符串
 def is_int_str(str):
@@ -25,6 +26,7 @@ def main_func():
     '[5] - 创建用于存放*完整*视频文件的目录（如果要上传发布的视频文件还没有放到该项目的指定目录下，则请先执行该操作）',
     '[6] - 创建用于存放*分段*视频文件的目录（如果要上传发布的视频文件还没有放到该项目的指定目录下，则请先执行该操作）',
     '[7] - 自动分解视频后，直接执行分段剪辑操作（即自动执行第 [4]+[1] 的操作）',
+    '[8] - 视频集锦制作（自由选择已有视频分段，合并成一个集锦视频文件）'
   ]
   print('请选择要操作的功能：(默认 [1])')
   for hint in hint_options:
@@ -83,3 +85,5 @@ def main_func():
   elif user_selected == '7':
     split_video_main_func(upload_config_module)
     combine_main_func(upload_config_module)
+  elif user_selected == '8':
+    video_collection_main_func(upload_config_module)
