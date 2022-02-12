@@ -52,7 +52,7 @@ def split_video():
             video_split_tsfiles_by_ffmpeg(ts_file_root_dir,video_dir,video_file_name,video_format,tsfiles_out_dir,ts_unit_long_s)
 
 # 这个视频分解功能目前就是为了开源项目而做的，这里没有实际运用
-# 因为我自己的项目里时爬虫爬取的视频资源（.ts 文件），但是开源项目中不能参杂这种功能，涉及侵权
+# 因为我自己的项目里的视频资源（.ts 文件），但是开源项目中不能参杂这种功能，涉及侵权
 # 所以为了使得开源项目中能有用处，加入视频分解功能，使用者可以先自己的视频文件放到对应目录下，然后分解，再重新分段合并，如此一来开源项目也能够有实际用途了
 ''' 提供给外界调用的主入口函数 '''
 def main_func(upload_config_module):

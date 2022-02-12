@@ -208,6 +208,7 @@ def combine_ts_group_by_timeval(paragraph_time_list,ts_file_root_dir,ts_file_vid
     # ts_file_list_len = len(ts_file_list)
     # 遍历时刻字符串数组，依次执行相应的分段操作
     for p_idx,time_range in enumerate(paragraph_time_list):
+        log_print('请耐心稍等，精剪操作可能有点久...')
         time_list = str(time_range).split(',')
         # 开始时刻
         start_time_list = time_list[0].split(':')
@@ -222,7 +223,7 @@ def combine_ts_group_by_timeval(paragraph_time_list,ts_file_root_dir,ts_file_vid
         end_s = int(end_time_list[2]) # 秒
         end_total_sec = end_h * 60 * 60 + end_m * 60 + end_s # 结束时刻转换为 秒级 数值
 
-        # TODO:根据以上计算所得 秒级 范围，收集对应要进行合并的 .ts 文件
+        # 根据以上计算所得 秒级 范围，收集对应要进行合并的 .ts 文件
         collect_ts_file_list = [] # 收集相应的 .ts 文件
         duration_total_s = 0 # 遍历 .ts 文件时的累加时长(单位：秒)
         for ts_file_name in ts_file_list:
@@ -235,7 +236,6 @@ def combine_ts_group_by_timeval(paragraph_time_list,ts_file_root_dir,ts_file_vid
             # 若累加时长在 开始 和 结束 的范围内，则记录下这个范围内的 .ts 文件的绝对路径
             if duration_total_s >= start_total_sec and duration_total_s <= end_total_sec:
                 collect_ts_file_list.append(ts_file_path)
-        # TODO:这里有问题
         log_print(f'收集到的.ts列表：\n{collect_ts_file_list}')
         
         # 准备把上面整理好的 当前分段的所有 .ts 文件的所在文件夹 一起合并成一个 视频文件(如 .mp4)
@@ -291,7 +291,7 @@ def combine_video():
 
         for episode in need_upload_video_episode_list:
             ts_folder_name = '{0}_{1}'.format(cfg['second_name'],episode)
-            # 找到爬虫已下载的视频的所有 .ts 文件
+            # 找到视频的所有 .ts 文件
             ts_file_root_dir = '{0}{1}/{2}/{3}'.format(__ROOTPATH__, video_download_file_root_dir, cfg['first_name'],cfg['second_name'])
             ts_file_dir = '{0}/tsfiles'.format(ts_file_root_dir)
             ts_file_video_dir = '{0}/{1}'.format(ts_file_dir,ts_folder_name)
@@ -315,7 +315,7 @@ def combine_video():
             if not ts_folder_name in need_upload_video_episode_filename_list:
                 print('当前文件不需要进行上传，所以无需分段：\n{}'.format(ts_folder_name))
                 continue
-            # 只找实际存在的文件夹（实际爬虫已爬取到充足的 .ts 文件）
+            # 只找实际存在的文件夹（ .ts 文件所在目录）
             elif os.path.exists(ts_file_video_dir):
                 # 判定选择分段方案：分段剪辑方案：[1] - 精确分段方案; [2] - 粗略分段方案;
                 # 当 paragraph_time_list（精确分段参数）为时刻字符串数组时，会默认执行[1] - 精确分段方案；当 paragraph_time_list（精确分段参数）为空数组时，程序会选择 [2] - 粗略分段方案; 去执行分段剪辑；
