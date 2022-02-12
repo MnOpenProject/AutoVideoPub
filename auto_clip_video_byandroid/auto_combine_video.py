@@ -33,6 +33,8 @@ import shutil
 import json
 from .combine_ts_by_ffmpeg import combine_ts_by_ffmpeg
 from .config.connection_config import out_log_file
+from .combine_ts_by_ffmpeg import combine_ts_by_ffmpeg,combine_ts_by_ffmpeg2
+from .common.ffmpeg_util import get_duration_from_ffmpeg
 
 ''' ======================== 无限递归的解决方案 start ========================== '''
 # 这个值的大小取决你自己，最好适中即可，执行完递归再降低，毕竟递归深度太大，如果是其他未知的操作引起，可能会造成内存溢出
@@ -195,6 +197,71 @@ def clear_fullfiles_folder(p_second_dir_videodir):
     del_files(p_second_dir_videodir) # 清空文件夹
     log_print('已清空 fullfiles 文件夹:\n{0}'.format(p_second_dir_videodir))
 
+# [1] - 精确分段方案;
+# 精确分段参数案例（必须满足该格式要求，否则程序会异常报错）：['00:01:25,00:02:59', '00:03:25,00:04:39']
+def combine_ts_group_by_timeval(paragraph_time_list,ts_file_root_dir,ts_file_video_dir,p_second_dir_videodir,ts_folder_name):
+    log_print('当前视频文件的根目录: \n{0}'.format(ts_file_root_dir))
+    log_print('具体的 .ts 文件目录：\n{0}'.format(ts_file_video_dir))
+    # 获取文件夹下的所有文件名
+    ts_file_list = os.listdir(ts_file_video_dir)
+    ts_file_list = bubbleSortTsFile(ts_file_list) # 一定要进行按序号名称从小到大排好序，才能确保后续操作
+    # ts_file_list_len = len(ts_file_list)
+    # 遍历时刻字符串数组，依次执行相应的分段操作
+    for p_idx,time_range in enumerate(paragraph_time_list):
+        time_list = str(time_range).split(',')
+        # 开始时刻
+        start_time_list = time_list[0].split(':')
+        start_h = int(start_time_list[0]) # 时
+        start_m = int(start_time_list[1]) # 分
+        start_s = int(start_time_list[2]) # 秒
+        start_total_sec = start_h * 60 * 60 + start_m * 60 + start_s # 开始时刻转换为 秒级 数值
+        # 结束时刻
+        end_time_list = time_list[1].split(':')
+        end_h = int(end_time_list[0]) # 时
+        end_m = int(end_time_list[1]) # 分
+        end_s = int(end_time_list[2]) # 秒
+        end_total_sec = end_h * 60 * 60 + end_m * 60 + end_s # 结束时刻转换为 秒级 数值
+
+        # TODO:根据以上计算所得 秒级 范围，收集对应要进行合并的 .ts 文件
+        collect_ts_file_list = [] # 收集相应的 .ts 文件
+        duration_total_s = 0 # 遍历 .ts 文件时的累加时长(单位：秒)
+        for ts_file_name in ts_file_list:
+            ts_file_path = f'{ts_file_video_dir}/{ts_file_name}'
+            # 获取当前.ts文件的时长
+            duration_s = get_duration_from_ffmpeg(ts_file_path)
+            # 取整
+            duration_s = int(round(float(duration_s),1))
+            duration_total_s += duration_s
+            # 若累加时长在 开始 和 结束 的范围内，则记录下这个范围内的 .ts 文件的绝对路径
+            if duration_total_s >= start_total_sec and duration_total_s <= end_total_sec:
+                collect_ts_file_list.append(ts_file_path)
+        # TODO:这里有问题
+        log_print(f'收集到的.ts列表：\n{collect_ts_file_list}')
+        
+        # 准备把上面整理好的 当前分段的所有 .ts 文件的所在文件夹 一起合并成一个 视频文件(如 .mp4)
+        # 为了适应 <必剪 app> 的视频编辑时视频声音丢失的情况，这里特意把每个分段文件独立放到一个文件夹里，方便 app 里单独查找文件抽离声音
+        # 对当前视频片段进行合并
+        # 对当前分段的 .ts 视频进行分类放到不同的文件夹下，因为合并时需要对整个文件夹进行合并成一个 视频文件(如 .mp4)
+        # 当前分段的所有 .ts 文件存放的文件夹路径
+        p_idx_sfx = '0{0}'.format(p_idx + 1) if len(str(p_idx + 1)) < 2 else p_idx + 1
+        p_video_name = '{0}_{1}'.format(ts_folder_name,p_idx_sfx)
+        p_video_file_full_pre_dir = '{0}/{1}'.format(p_second_dir_videodir,p_video_name)
+        if not os.path.exists(p_video_file_full_pre_dir):
+            os.makedirs(p_video_file_full_pre_dir)
+        p_video_file_full = '{0}/{1}{2}'.format(p_video_file_full_pre_dir,p_video_name,video_file_Format)
+        log_print('当前片段 视频合成文件的完整路径: \n{0}'.format(p_video_file_full))
+        # 开始合并并输出视频文件
+        tsvideoRoot = ts_file_root_dir
+        # tsFileDir = p_tsfiles_dir
+        saveFileDir = p_video_file_full_pre_dir
+        saveFilePath = p_video_file_full
+        # 合并本次收集到的 .ts 文件，输出为一个分段视频
+        log_print(f'【*】 tsvideoRoot = {tsvideoRoot}')
+        # log_print(f'【*】 tsFileDir = {tsFileDir}')
+        log_print(f'【*】 saveFileDir = {saveFileDir}')
+        log_print(f'【*】 saveFilePath = {saveFilePath}')
+        combine_ts_by_ffmpeg2(tsvideoRoot, collect_ts_file_list, saveFileDir, saveFilePath, log_print)
+
 # 对 .ts 文件进行 片段剪辑 并进行分段合并成一个视频文件(比如 .mp4)
 def combine_video():
     for cfg in video_file_config_list:
@@ -250,6 +317,14 @@ def combine_video():
                 continue
             # 只找实际存在的文件夹（实际爬虫已爬取到充足的 .ts 文件）
             elif os.path.exists(ts_file_video_dir):
+                # 判定选择分段方案：分段剪辑方案：[1] - 精确分段方案; [2] - 粗略分段方案;
+                # 当 paragraph_time_list（精确分段参数）为时刻字符串数组时，会默认执行[1] - 精确分段方案；当 paragraph_time_list（精确分段参数）为空数组时，程序会选择 [2] - 粗略分段方案; 去执行分段剪辑；
+                paragraph_time_list = cfg['paragraph_time_list']
+                if isinstance(paragraph_time_list,list) and len(paragraph_time_list) > 0:
+                    # [1] - 精确分段方案;
+                    # 精确分段参数案例（必须满足该格式要求，否则程序会异常报错）：['00:01:25,00:02:59', '00:03:25,00:04:39']
+                    combine_ts_group_by_timeval(paragraph_time_list,ts_file_root_dir,ts_file_video_dir,p_second_dir_videodir,ts_folder_name)
+                    continue
                 # 一个 .ts 文件的时长(单位：秒)
                 unit_ts_long_s = cfg['ts_unit_long_s']
 

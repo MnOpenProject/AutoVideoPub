@@ -94,7 +94,7 @@
 
 # 新增功能（new）
 * 【视频说明链接】：https://www.bilibili.com/video/BV1334y117pw/
-    * 【视频集锦制作】：可以把本地已有的多个分段视频进行自由组合成一个完整的集锦视频(即 auto_clip_video_byandroid\video\ 目录下的视频文件)，并进行自动上传，这比单纯上传一个单一的分段视频更好些，使用者可以按程序的命名规则手动在 auto_clip_video_byandroid\video\ 目录下放置自己的过渡视频文件，如此可以让集锦视频有了过渡画面，避免不同的视频片段变换僵硬的问题
+    * （new1）【视频集锦制作】：可以把本地已有的多个分段视频进行自由组合成一个完整的集锦视频(即 auto_clip_video_byandroid\video\ 目录下的视频文件)，并进行自动上传，这比单纯上传一个单一的分段视频更好些，使用者可以按程序的命名规则手动在 auto_clip_video_byandroid\video\ 目录下放置自己的过渡视频文件，如此可以让集锦视频有了过渡画面，避免不同的视频片段变换僵硬的问题
     * 使用说明：
     * * (1) - 先老样子，按照命名规则，在 \auto_clip_video_byandroid\config\upload_config_files\ 目录下创建一个配置文件，这个配置文件命名一定要以 collection 开头，后续功能开发将以此来识别是否为集锦配置文件（已给案例参考：collectionFunny1.py）（cutsceneSnowflake1.py 是过场动画配置案例脚本，用于创建放置视频的目录）
     * * (2) - 在 \auto_clip_video_byandroid\video_action\ 目录下添加一个可以扩展自己剪辑操作的脚本  这目录下（已给案例参考：collectionFunny1.py）
@@ -103,6 +103,7 @@
     [8] - 视频集锦制作（自由选择已有视频分段，合并成一个集锦视频文件）
     ```
     * * 随后便可以自由输入自己想要组合的片段序号，回车即可得到合并后的集锦视频文件，同样是输出在 auto_clip_video_byandroid\video\ 目录下
+    * （new2）【视频分段剪辑功能 -- 新增精剪方案】：upload_config_files\ 目录下配置文件中的 video_file_config_list 里新增这参数 'paragraph_time_list': ['00:01:25,00:02:59', '00:03:25,00:04:39'], 分段剪辑通过识别该参数执行精剪
 
 ## 附加说明
 * 
