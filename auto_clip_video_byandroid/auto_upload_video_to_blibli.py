@@ -481,8 +481,8 @@ def start_upload_video():
                     write_uploaded_remember_txt(upload_video_1th_name,upload_video_2th_name,upload_video_episode,upload_video_paragraph_serial,True,is_black_video)
                     log_print(f'操作完成 【[{upload_title_full}] - 错误无法发布视频到B站，即将重启任务】\n')
                     force_sleep(6)
-                    # 重启任务（不用单选需要重新选择，程序已记录下前面的选择项，静静等待即可)
-                    log_print('---------- 重启任务（不用单选需要重新选择，程序已记录下前面的选择项，静静等待即可) ---------------')
+                    # 重启任务（不用担心需要重新选择，程序已记录下前面的选择项，静静等待即可)
+                    log_print('---------- 重启任务（不用担心需要重新选择，程序已记录下前面的选择项，静静等待即可) ---------------')
                     start_program()
                 # ------------------------- 视频已进行发布，此时返回到了主菜单画面，且定位在 <我的> 页签上，需要切换到 <创作> 页签的画面 -------------
                 log_print('\n------- 正在进行 【视频已进行发布，此时返回到了主菜单画面，且定位在 <我的> 页签上，需要切换到 <创作> 页签的画面】 ------\n')
