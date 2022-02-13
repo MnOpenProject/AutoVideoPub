@@ -208,7 +208,7 @@ def combine_ts_group_by_timeval(paragraph_time_list,ts_file_root_dir,ts_file_vid
         for dir_name in fullfiles_dirlist:
             if ts_folder_name in dir_name:
                 dir_path = f'{p_second_dir_videodir}/{dir_name}'
-                if os.path.exists(p_second_dir_videodir):
+                if os.path.exists(dir_path):
                     # 删除该目录下的视频文件
                     del_files(dir_path)
                     # 这个操作只会删除一个文件夹（若使用 os.removedirs 会递归删除目录，即若父目录为空文件夹会一直递归删除直到一个父目录下存在其他子文件夹才会停止
