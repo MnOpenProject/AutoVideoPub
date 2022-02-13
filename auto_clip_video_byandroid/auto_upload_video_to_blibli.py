@@ -443,8 +443,15 @@ def start_upload_video():
                 log_print('\n------- 选择视频文件 ------\n{0}\n'.format(video_show_file))
                 # [5] - 点击存放视频文件的 二级节目文件夹（这一级是特意加的跟文件名同名的一层文件夹）
                 log_print('# [5] - 点击存放视频文件的 二级节目文件夹（这一级是特意加的跟文件名同名的一层文件夹）')
-                video_show_file_floder_item = driver.find_element(AppiumBy.ANDROID_UIAUTOMATOR,'new UiSelector().textContains("{}")'.format(video_show_file))
-                video_show_file_floder_item.click()
+                for i in range(20):
+                    try:
+                        video_show_file_floder_item = driver.find_element(AppiumBy.ANDROID_UIAUTOMATOR,'new UiSelector().textContains("{}")'.format(video_show_file))
+                        video_show_file_floder_item.click()
+                        break
+                    except Exception as ex:
+                        # 若没找到对应的目录就下滑，再重新尝试查找
+                        swipeDown(driver,100)
+                        continue
                 # [5.1] - 点击存放视频文件的 二级节目文件夹（这一级则是具体的视频文件了）
                 log_print('[5.1] - 点击存放视频文件的 二级节目文件夹（这一级则是具体的视频文件了）')
                 video_show_file_item = driver.find_element(AppiumBy.ANDROID_UIAUTOMATOR,'new UiSelector().textContains("{}")'.format(video_show_file))
@@ -598,8 +605,15 @@ def pub_video_action_func(elementIdPrefix,upload_channel,upload_title,upload_vid
     pub_title_input = driver.find_element(AppiumBy.ID, "{}publish_title_area_title_et".format(elementIdPrefix))
     pub_title_input.send_keys(u'{}'.format(upload_title_full))
     # [24.1] - 输入内容 <动态> 由于点击下面的操作后，画面很可能就不够显示了，所以趁现在先把动态填写好
-    pub_dynamic_input = driver.find_element(AppiumBy.ID, "{}publish_feed_area_et".format(elementIdPrefix))
-    pub_dynamic_input.send_keys(upload_dynamic)
+    log_print('输入 <动态>\n{}'.format(upload_dynamic))
+    for i in range(5):
+        try:
+            pub_dynamic_input = driver.find_element(AppiumBy.ID, "{}publish_feed_area_et".format(elementIdPrefix))
+            pub_dynamic_input.send_keys(upload_dynamic)
+            break
+        except Exception as ex:
+            swipeDown(driver,100)
+            continue
     # [24.2] - 点击链接按钮 <查看更多选项> 
     pub_see_more_link = driver.find_element(AppiumBy.ID, "{}publish_more_area_show_more_tv".format(elementIdPrefix))
     pub_see_more_link.click()
@@ -672,22 +686,31 @@ def pub_video_action_func(elementIdPrefix,upload_channel,upload_title,upload_vid
     pub_tag_confirm_btn = driver.find_element(AppiumBy.ANDROID_UIAUTOMATOR,'new UiSelector().textContains("完成")')
     pub_tag_confirm_btn.click()
 
-    # 修改封面操作
-    edit_pubcover(log_print,driver,force_sleep,elementIdPrefix,cover_type,cover_item,cover_text_list)
+    # 检测视频是否正常（经常出现有的视频发布的时候，导出时一片黑的情况，凡是出现这种情况均直接跳过该视频）
+    valid_pass = check_video_action()
 
-    log_print('操作完成 【导出视频】\n')
-    # ------------------------- 发布视频到B站 -------------
-    log_print('\n------- 正在进行 【发布视频到B站】 ------\n')
-    # [29] - 点击按钮 <发布B站 每日瓜分奖金> 标签设定完成
-    # try:
-    #     pub_video_to_bilibili_btn = driver.find_element(AppiumBy.ID,"{}activity_publish_publish_tv".format(elementIdPrefix))
-    #     pub_video_to_bilibili_btn.click()
-    # except:
-    #     driver.tap([(655,2216)],10)
-    driver.tap([(655,2216)],10)
-    # [30] - 将当前已成功发布到B站的视频记录下来，下次再执行程序时，会读取记录，并排除已发布过的视频
-    write_uploaded_remember_txt(upload_video_1th_name,upload_video_2th_name,upload_video_episode,upload_video_paragraph_serial)
-    log_print(f'操作完成 【[{upload_title_full}] - 已发布视频到B站】\n')
+    # 修改封面操作
+    need_replace_cover_img = not valid_pass
+    edit_pubcover(log_print,driver,force_sleep,elementIdPrefix,cover_type,cover_item,cover_text_list,need_replace_cover_img)
+
+    # 检测视频是否正常（经常出现有的视频发布的时候，导出时一片黑的情况，凡是出现这种情况均直接跳过该视频）
+    valid_pass = check_video_action()
+    if not valid_pass:
+        raise Exception('black,视频导出异常 -- 出现黑屏情况')
+    else:
+        log_print('操作完成 【导出视频】\n')
+        # ------------------------- 发布视频到B站 -------------
+        log_print('\n------- 正在进行 【发布视频到B站】 ------\n')
+        # [29] - 点击按钮 <发布B站 每日瓜分奖金> 标签设定完成
+        # try:
+        #     pub_video_to_bilibili_btn = driver.find_element(AppiumBy.ID,"{}activity_publish_publish_tv".format(elementIdPrefix))
+        #     pub_video_to_bilibili_btn.click()
+        # except:
+        #     driver.tap([(655,2216)],10)
+        driver.tap([(655,2216)],10)
+        # [30] - 将当前已成功发布到B站的视频记录下来，下次再执行程序时，会读取记录，并排除已发布过的视频
+        write_uploaded_remember_txt(upload_video_1th_name,upload_video_2th_name,upload_video_episode,upload_video_paragraph_serial)
+        log_print(f'操作完成 【[{upload_title_full}] - 已发布视频到B站】\n')
     force_sleep(6)
 
 # 终端询问选择哪个视频节目的配置参数
