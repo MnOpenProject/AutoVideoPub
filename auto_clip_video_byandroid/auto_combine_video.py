@@ -202,15 +202,17 @@ def clear_fullfiles_folder(p_second_dir_videodir):
 def combine_ts_group_by_timeval(paragraph_time_list,ts_file_root_dir,ts_file_video_dir,p_second_dir_videodir,ts_folder_name):
     log_print('当前视频文件的根目录: \n{0}'.format(ts_file_root_dir))
     log_print('具体的 .ts 文件目录：\n{0}'.format(ts_file_video_dir))
-    # 先清空 video/xxx/xxx/fullfiles 目录下与当前已存在分段视频分集的文件夹及其视频文件
-    fullfiles_dirlist = os.listdir(p_second_dir_videodir)
-    for dir_name in fullfiles_dirlist:
-        if ts_folder_name in dir_name:
-            dir_path = f'{p_second_dir_videodir}/{dir_name}'
-            # 删除该目录下的视频文件
-            del_files(dir_path)
-            # 这个操作只会删除一个文件夹（若使用 os.removedirs 会递归删除目录，即若父目录为空文件夹会一直递归删除直到一个父目录下存在其他子文件夹才会停止
-            os.rmdir(dir_path)
+    if os.path.exists(p_second_dir_videodir):
+        # 先清空 video/xxx/xxx/fullfiles 目录下与当前已存在分段视频分集的文件夹及其视频文件
+        fullfiles_dirlist = os.listdir(p_second_dir_videodir)
+        for dir_name in fullfiles_dirlist:
+            if ts_folder_name in dir_name:
+                dir_path = f'{p_second_dir_videodir}/{dir_name}'
+                if os.path.exists(p_second_dir_videodir):
+                    # 删除该目录下的视频文件
+                    del_files(dir_path)
+                    # 这个操作只会删除一个文件夹（若使用 os.removedirs 会递归删除目录，即若父目录为空文件夹会一直递归删除直到一个父目录下存在其他子文件夹才会停止
+                    os.rmdir(dir_path)
     
     # 获取文件夹下的所有文件名
     ts_file_list = os.listdir(ts_file_video_dir)
