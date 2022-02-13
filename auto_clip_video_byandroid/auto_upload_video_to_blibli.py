@@ -462,7 +462,7 @@ def start_upload_video():
                     video_file_full_name = os.listdir(video_show_file_dir)[0]
                     video_show_file_path = f'{video_show_file_dir}/{video_file_full_name}'
                     # [***] - (不同的视频可以对应不同的剪辑脚本)动态引入对应当前视频的剪辑操作模块，并调用其中的执行函数
-                    action_script_path = f'{__ROOTPATH__}auto_clip_video_byandroid/video_action/{upload_video_1th_name}/{upload_video_2th_name}'
+                    action_script_path = f'{__ROOTPATH__}auto_clip_video_byandroid/video_action/{upload_video_1th_name}/{upload_video_2th_name}.py'
                     if not os.path.exists(action_script_path):
                         action_script_hint = f'！！！注意：缺少 video_action 脚本，请创建该脚本后，再重新执行程序\n缺少的脚本是: {action_script_path}'
                         log_print(action_script_hint)
