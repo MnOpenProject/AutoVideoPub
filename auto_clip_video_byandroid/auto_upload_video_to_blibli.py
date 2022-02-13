@@ -577,10 +577,20 @@ def pub_video_action_func(elementIdPrefix,upload_channel,upload_title,upload_vid
     pub_channel_layout = driver.find_element(AppiumBy.ID, "{}publish_district_area_cl".format(elementIdPrefix))
     pub_channel_layout.click()
     # 根据配置参数 选择具体分区
-    for upload_channel_item in upload_channel.split(','):
-        # [23.1] - 选择具体分区
-        pub_channel_select_layout = driver.find_element(AppiumBy.ANDROID_UIAUTOMATOR,'new UiSelector().textContains("{}")'.format(upload_channel_item))
-        pub_channel_select_layout.click()
+    for item_idx,upload_channel_item in enumerate(upload_channel.split(',')):
+        log_print(f'[{item_idx+1}]级 分区：{upload_channel_item}')
+        swipe_position = (86,1649)
+        if item_idx == 1:
+            swipe_position = (804,1636)
+        for i in range(10):
+            try:
+                # [23.1] - 选择具体分区
+                pub_channel_select_layout = driver.find_element(AppiumBy.ANDROID_UIAUTOMATOR,'new UiSelector().textContains("{}")'.format(upload_channel_item))
+                pub_channel_select_layout.click()
+                break
+            except Exception as ex:
+                swipeDown(driver,100,position=swipe_position)
+                continue
     # [24] - 输入 <标题>
     #: '坚持学习英语口语--练习材料--《美剧：硅谷》--第{0}季，第{1}集，材料{2}'
     upload_title_full = upload_title.format(upload_video_2th_name.replace(upload_video_1th_name,''),upload_video_episode,upload_video_paragraph_serial)
