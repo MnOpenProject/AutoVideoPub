@@ -234,6 +234,9 @@ def combine_ts_group_by_timeval(paragraph_time_list,ts_file_root_dir,ts_file_vid
         end_m = int(end_time_list[1]) # 分
         end_s = int(end_time_list[2]) # 秒
         end_total_sec = end_h * 60 * 60 + end_m * 60 + end_s # 结束时刻转换为 秒级 数值
+        # 检测开始时刻和结束时刻是否合理
+        if start_total_sec > end_total_sec:
+            log_print('！！！ 注意：设定的时间范围有误，开始时刻 晚于了 结束时刻，请修改后重试 ！！！')
 
         # 根据以上计算所得 秒级 范围，收集对应要进行合并的 .ts 文件
         collect_ts_file_list = [] # 收集相应的 .ts 文件
