@@ -370,6 +370,8 @@ def start_upload_video():
                 upload_title = '' #: '坚持学习英语口语--练习材料--《美剧：硅谷》--第{0}季，第{1}集，材料{2}',
                 # 类型
                 upload_type = '' #: '自制',
+                # 视频来源
+                video_source = ''
                 # 标签
                 upload_tags = '' #: '生活,学习,分享',
                 # 标签--参与话题
@@ -420,6 +422,8 @@ def start_upload_video():
                                     upload_title = need_upload_config_item['upload_title'] #: '坚持学习英语口语--练习材料--《美剧：硅谷》--第{0}季，第{1}集，材料{2}',
                                     # 类型
                                     upload_type = need_upload_config_item['upload_type'] #: '自制',
+                                    # 视频来源
+                                    video_source = need_upload_config_item['video_source']
                                     # 标签
                                     upload_tags = need_upload_config_item['upload_tags'] #: '生活,学习,分享',
                                     # 标签--参与话题
@@ -483,7 +487,7 @@ def start_upload_video():
                     log_print('\n--------------------- 正在进行 【发布视频】 ------------------------\n')
 
                     # 执行在 发布视频 画面 填写发布信息的操作
-                    pub_video_action(elementIdPrefix,upload_channel,upload_title,upload_video_2th_name,upload_video_1th_name,upload_video_episode,upload_video_paragraph_serial,upload_type,upload_tags_subject,upload_tags,instroduction,upload_dynamic,cover_type,cover_item,cover_text_list)
+                    pub_video_action(elementIdPrefix,upload_channel,upload_title,upload_video_2th_name,upload_video_1th_name,upload_video_episode,upload_video_paragraph_serial,upload_type,video_source,upload_tags_subject,upload_tags,instroduction,upload_dynamic,cover_type,cover_item,cover_text_list)
                 except Exception as ex:
                     upload_title_full = upload_title.format(upload_video_2th_name.replace(upload_video_1th_name,''),upload_video_episode,upload_video_paragraph_serial)
                     sufix_list = str(ex).split(',')
@@ -569,16 +573,16 @@ def check_video_action():
 
     return True
 
-def pub_video_action(elementIdPrefix,upload_channel,upload_title,upload_video_2th_name,upload_video_1th_name,upload_video_episode,upload_video_paragraph_serial,upload_type,upload_tags_subject,upload_tags,instroduction,upload_dynamic,cover_type,cover_item,cover_text_list):
+def pub_video_action(elementIdPrefix,upload_channel,upload_title,upload_video_2th_name,upload_video_1th_name,upload_video_episode,upload_video_paragraph_serial,upload_type,video_source,upload_tags_subject,upload_tags,instroduction,upload_dynamic,cover_type,cover_item,cover_text_list):
     # 检测视频是否正常（经常出现有的视频发布的时候，导出时一片黑的情况，凡是出现这种情况均直接跳过该视频）
     valid_pass = check_video_action()
     if not valid_pass:
         raise Exception('black,视频导出异常 -- 出现黑屏情况')
     else:
-        pub_video_action_func(elementIdPrefix,upload_channel,upload_title,upload_video_2th_name,upload_video_1th_name,upload_video_episode,upload_video_paragraph_serial,upload_type,upload_tags_subject,upload_tags,instroduction,upload_dynamic,cover_type,cover_item,cover_text_list)
+        pub_video_action_func(elementIdPrefix,upload_channel,upload_title,upload_video_2th_name,upload_video_1th_name,upload_video_episode,upload_video_paragraph_serial,upload_type,video_source,upload_tags_subject,upload_tags,instroduction,upload_dynamic,cover_type,cover_item,cover_text_list)
 
 # 执行在 发布视频 画面 填写发布信息的操作
-def pub_video_action_func(elementIdPrefix,upload_channel,upload_title,upload_video_2th_name,upload_video_1th_name,upload_video_episode,upload_video_paragraph_serial,upload_type,upload_tags_subject,upload_tags,instroduction,upload_dynamic,cover_type,cover_item,cover_text_list):
+def pub_video_action_func(elementIdPrefix,upload_channel,upload_title,upload_video_2th_name,upload_video_1th_name,upload_video_episode,upload_video_paragraph_serial,upload_type,video_source,upload_tags_subject,upload_tags,instroduction,upload_dynamic,cover_type,cover_item,cover_text_list):
     log_print('\n------- 执行在发布视频画面的填写发布信息的操作 ------\n')
     # [23] - 点击区域 <分区>
     pub_channel_layout = driver.find_element(AppiumBy.ID, "{}publish_district_area_cl".format(elementIdPrefix))
@@ -620,9 +624,7 @@ def pub_video_action_func(elementIdPrefix,upload_channel,upload_title,upload_vid
     # [24.3] - 输入内容 <简介> 此时画面中正好能看到简介的输入区域（由于点击下面的操作后，画面很可能就不够显示了，所以趁现在先把简介填写好）
     pub_introduction_input = driver.find_element(AppiumBy.ID, "{}publish_more_area_intro_et".format(elementIdPrefix))
     pub_introduction_input.send_keys(instroduction)
-    # [25] - 点击单选 根据配置参数 选择视频类型
-    pub_type_radio = driver.find_element(AppiumBy.ANDROID_UIAUTOMATOR,'new UiSelector().textContains("{}")'.format(upload_type))
-    pub_type_radio.click()
+    
     # [26] - 点击开关 <禁止转载>
     pub_reprint_switch = driver.find_element(AppiumBy.ID, "{}publish_type_area_self_made_permit_reprint_cb".format(elementIdPrefix))
     pub_reprint_switch.click()
@@ -686,6 +688,18 @@ def pub_video_action_func(elementIdPrefix,upload_channel,upload_title,upload_vid
     pub_tag_confirm_btn = driver.find_element(AppiumBy.ANDROID_UIAUTOMATOR,'new UiSelector().textContains("完成")')
     pub_tag_confirm_btn.click()
 
+    # [25] - 点击单选 根据配置参数 选择视频类型
+    pub_type_radio = driver.find_element(AppiumBy.ANDROID_UIAUTOMATOR,'new UiSelector().textContains("{}")'.format(upload_type))
+    pub_type_radio.click()
+    if upload_type == '转载':
+        # 若是转载，则输入视频来源
+        video_source_input = driver.find_element(AppiumBy.ID, "{}publish_type_area_source_et".format(elementIdPrefix))
+        video_source_input.send_keys(video_source)
+    if upload_type == '自制':
+        # [26] - 点击开关 <禁止转载>
+        pub_reprint_switch = driver.find_element(AppiumBy.ID, "{}publish_type_area_self_made_permit_reprint_cb".format(elementIdPrefix))
+        pub_reprint_switch.click()
+
     # 检测视频是否正常（经常出现有的视频发布的时候，导出时一片黑的情况，凡是出现这种情况均直接跳过该视频）
     valid_pass = check_video_action()
 
@@ -729,6 +743,8 @@ def ask_select_upload_config(multi_select_enabled=False,is_pub=True):
     upload_title = '' #: '坚持学习英语口语--练习材料--《美剧：硅谷》--第{0}季，第{1}集，材料{2}',
     # 类型
     upload_type = '' #: '自制',
+    # 视频来源
+    video_source = ''
     # 标签
     upload_tags = '' #: '生活,学习,分享',
     # 标签--参与话题
@@ -765,6 +781,8 @@ def ask_select_upload_config(multi_select_enabled=False,is_pub=True):
         upload_title = params['upload_title'] #: '坚持学习英语口语--练习材料--《美剧：硅谷》--第{0}季，第{1}集，材料{2}',
         # 类型
         upload_type = params['upload_type'] #: '自制',
+        # 视频来源
+        video_source = params['video_source']
         # 标签
         upload_tags = params['upload_tags'] #: '生活,学习,分享',
         # 标签--参与话题
@@ -812,6 +830,8 @@ def ask_select_upload_config(multi_select_enabled=False,is_pub=True):
                     'upload_title':  params['upload_title'],
                     # 类型
                     'upload_type':  params['upload_type'],
+                    # 视频来源
+                    'video_source': params['video_source'],
                     # 标签
                     'upload_tags':  params['upload_tags'],
                     # 标签--参与话题（请只设置一项即可）（注：经测试话题参与只能选一项，虽然我程序里支持多项，但是就设置了多项，<必剪 app>也会把后一项覆盖前一项）
@@ -868,6 +888,8 @@ def ask_select_upload_config(multi_select_enabled=False,is_pub=True):
                 upload_title = params['upload_title'] #: '坚持学习英语口语--练习材料--《美剧：硅谷》--第{0}季，第{1}集，材料{2}',
                 # 类型
                 upload_type = params['upload_type'] #: '自制',
+                # 视频来源
+                video_source = params['video_source']
                 # 标签
                 upload_tags = params['upload_tags'] #: '生活,学习,分享',
                 # 标签--参与话题
@@ -880,7 +902,7 @@ def ask_select_upload_config(multi_select_enabled=False,is_pub=True):
                 cover_item = params['cover_item']
                 cover_text_list = params['cover_text_list']
                 # 把多选的参数都收集起来
-                select_result.append([upload_channel,upload_title,upload_video_2th_name,upload_video_1th_name,upload_video_episode,upload_video_paragraph_serial,upload_type,upload_tags_subject,upload_tags,instroduction,upload_dynamic,cover_type,cover_item,cover_text_list])
+                select_result.append([upload_channel,upload_title,upload_video_2th_name,upload_video_1th_name,upload_video_episode,upload_video_paragraph_serial,upload_type,video_source,upload_tags_subject,upload_tags,instroduction,upload_dynamic,cover_type,cover_item,cover_text_list])
         return select_result
     else:
         video_select = 1 if not is_int_str(video_select) or int(video_select) < 1 or int(video_select) > len_select_video_params_list else int(video_select)
@@ -903,6 +925,8 @@ def ask_select_upload_config(multi_select_enabled=False,is_pub=True):
         upload_title = params['upload_title'] #: '坚持学习英语口语--练习材料--《美剧：硅谷》--第{0}季，第{1}集，材料{2}',
         # 类型
         upload_type = params['upload_type'] #: '自制',
+        # 视频来源
+        video_source = params['video_source']
         # 标签
         upload_tags = params['upload_tags'] #: '生活,学习,分享',
         # 标签--参与话题
@@ -915,7 +939,7 @@ def ask_select_upload_config(multi_select_enabled=False,is_pub=True):
         cover_item = params['cover_item']
         cover_text_list = params['cover_text_list']
 
-        return [upload_channel,upload_title,upload_video_2th_name,upload_video_1th_name,upload_video_episode,upload_video_paragraph_serial,upload_type,upload_tags_subject,upload_tags,instroduction,upload_dynamic,cover_type,cover_item,cover_text_list]
+        return [upload_channel,upload_title,upload_video_2th_name,upload_video_1th_name,upload_video_episode,upload_video_paragraph_serial,upload_type,video_source,upload_tags_subject,upload_tags,instroduction,upload_dynamic,cover_type,cover_item,cover_text_list]
 
 # 仅执行在 发布视频画面 填写表单的操作
 def start_fill_pub_forms():
@@ -928,16 +952,16 @@ def start_fill_pub_forms():
     change_homepage_tab('我的')
     
     # 终端询问选择哪个视频节目的配置参数
-    upload_channel,upload_title,upload_video_2th_name,upload_video_1th_name,upload_video_episode,upload_video_paragraph_serial,upload_type,upload_tags_subject,upload_tags,instroduction,upload_dynamic,cover_type,cover_item,cover_text_list = ask_select_upload_config()
+    upload_channel,upload_title,upload_video_2th_name,upload_video_1th_name,upload_video_episode,upload_video_paragraph_serial,upload_type,video_source,upload_tags_subject,upload_tags,instroduction,upload_dynamic,cover_type,cover_item,cover_text_list = ask_select_upload_config()
     # 执行在 发布视频 画面 填写发布信息的操作
-    pub_video_action(elementIdPrefix,upload_channel,upload_title,upload_video_2th_name,upload_video_1th_name,upload_video_episode,upload_video_paragraph_serial,upload_type,upload_tags_subject,upload_tags,instroduction,upload_dynamic,cover_type,cover_item,cover_text_list)
+    pub_video_action(elementIdPrefix,upload_channel,upload_title,upload_video_2th_name,upload_video_1th_name,upload_video_episode,upload_video_paragraph_serial,upload_type,video_source,upload_tags_subject,upload_tags,instroduction,upload_dynamic,cover_type,cover_item,cover_text_list)
 
 # =================== 生成放置 分段 视频文件的目录 start ==============
 
 # 创建放置视频的文件夹目录的具体操作
 def mkdir_video_folder_one(params):
     # 终端询问选择哪个视频节目的配置参数
-    upload_channel,upload_title,upload_video_2th_name,upload_video_1th_name,upload_video_episode,upload_video_paragraph_serial,upload_type,upload_tags_subject,upload_tags,instroduction,upload_dynamic,cover_type,cover_item,cover_text_list = params
+    upload_channel,upload_title,upload_video_2th_name,upload_video_1th_name,upload_video_episode,upload_video_paragraph_serial,upload_type,video_source,upload_tags_subject,upload_tags,instroduction,upload_dynamic,cover_type,cover_item,cover_text_list = params
     # auto_clip_video_byandroid/video/
     video_dir = f'{__ROOTPATH__}auto_clip_video_byandroid/video'
     if not os.path.exists(video_dir):
@@ -988,6 +1012,8 @@ def ask_select_mkfullvideodir_config(multi_select_enabled=False):
     upload_title = '' #: '坚持学习英语口语--练习材料--《美剧：硅谷》--第{0}季，第{1}集，材料{2}',
     # 类型
     upload_type = '' #: '自制',
+    # 视频来源
+    video_source = ''
     # 标签
     upload_tags = '' #: '生活,学习,分享',
     # 标签--参与话题
@@ -1022,6 +1048,8 @@ def ask_select_mkfullvideodir_config(multi_select_enabled=False):
         upload_title = params['upload_title'] #: '坚持学习英语口语--练习材料--《美剧：硅谷》--第{0}季，第{1}集，材料{2}',
         # 类型
         upload_type = params['upload_type'] #: '自制',
+        # 视频来源
+        video_source = params['video_source']
         # 标签
         upload_tags = params['upload_tags'] #: '生活,学习,分享',
         # 标签--参与话题
@@ -1071,6 +1099,8 @@ def ask_select_mkfullvideodir_config(multi_select_enabled=False):
                     'upload_title':  params['upload_title'],
                     # 类型
                     'upload_type':  params['upload_type'],
+                    # 视频来源
+                    'video_source': params['video_source'],
                     # 标签
                     'upload_tags':  params['upload_tags'],
                     # 标签--参与话题（请只设置一项即可）（注：经测试话题参与只能选一项，虽然我程序里支持多项，但是就设置了多项，<必剪 app>也会把后一项覆盖前一项）
@@ -1127,6 +1157,8 @@ def ask_select_mkfullvideodir_config(multi_select_enabled=False):
                 upload_title = params['upload_title'] #: '坚持学习英语口语--练习材料--《美剧：硅谷》--第{0}季，第{1}集，材料{2}',
                 # 类型
                 upload_type = params['upload_type'] #: '自制',
+                # 视频来源
+                video_source = params['video_source']
                 # 标签
                 upload_tags = params['upload_tags'] #: '生活,学习,分享',
                 # 标签--参与话题
@@ -1139,7 +1171,7 @@ def ask_select_mkfullvideodir_config(multi_select_enabled=False):
                 cover_item = params['cover_item']
                 cover_text_list = params['cover_text_list']
                 # 把多选的参数都收集起来
-                select_result.append([upload_channel,upload_title,upload_video_2th_name,upload_video_1th_name,upload_video_episode,upload_video_paragraph_serial,upload_type,upload_tags_subject,upload_tags,instroduction,upload_dynamic,cover_type,cover_item,cover_text_list])
+                select_result.append([upload_channel,upload_title,upload_video_2th_name,upload_video_1th_name,upload_video_episode,upload_video_paragraph_serial,upload_type,video_source,upload_tags_subject,upload_tags,instroduction,upload_dynamic,cover_type,cover_item,cover_text_list])
         return select_result
     else:
         video_select = 1 if not is_int_str(video_select) or int(video_select) < 1 or int(video_select) > len_select_video_params_list else int(video_select)
@@ -1162,6 +1194,8 @@ def ask_select_mkfullvideodir_config(multi_select_enabled=False):
         upload_title = params['upload_title'] #: '坚持学习英语口语--练习材料--《美剧：硅谷》--第{0}季，第{1}集，材料{2}',
         # 类型
         upload_type = params['upload_type'] #: '自制',
+        # 视频来源
+        video_source = params['video_source']
         # 标签
         upload_tags = params['upload_tags'] #: '生活,学习,分享',
         # 标签--参与话题
@@ -1174,13 +1208,13 @@ def ask_select_mkfullvideodir_config(multi_select_enabled=False):
         cover_item = params['cover_item']
         cover_text_list = params['cover_text_list']
 
-        return [upload_channel,upload_title,upload_video_2th_name,upload_video_1th_name,upload_video_episode,upload_video_paragraph_serial,upload_type,upload_tags_subject,upload_tags,instroduction,upload_dynamic,cover_type,cover_item,cover_text_list]
+        return [upload_channel,upload_title,upload_video_2th_name,upload_video_1th_name,upload_video_episode,upload_video_paragraph_serial,upload_type,video_source,upload_tags_subject,upload_tags,instroduction,upload_dynamic,cover_type,cover_item,cover_text_list]
 
 
 # 创建放置视频的文件夹目录的具体操作
 def mkdir_full_video_folder_one(params):
     # 终端询问选择哪个视频节目的配置参数
-    upload_channel,upload_title,upload_video_2th_name,upload_video_1th_name,upload_video_episode,upload_video_paragraph_serial,upload_type,upload_tags_subject,upload_tags,instroduction,upload_dynamic,cover_type,cover_item,cover_text_list = params
+    upload_channel,upload_title,upload_video_2th_name,upload_video_1th_name,upload_video_episode,upload_video_paragraph_serial,upload_type,video_source,upload_tags_subject,upload_tags,instroduction,upload_dynamic,cover_type,cover_item,cover_text_list = params
     # downloadvideo/
     video_dir = f'{__ROOTPATH__}/downloadvideo'
     if not os.path.exists(video_dir):

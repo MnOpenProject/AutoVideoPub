@@ -103,7 +103,8 @@
     [8] - 视频集锦制作（自由选择已有视频分段，合并成一个集锦视频文件）
     ```
     * * 随后便可以自由输入自己想要组合的片段序号，回车即可得到合并后的集锦视频文件，同样是输出在 auto_clip_video_byandroid\video\ 目录下
-    * （new2）【视频分段剪辑功能 -- 新增精剪方案】：upload_config_files\ 目录下配置文件中的 video_file_config_list 里新增这参数 'paragraph_time_list': ['00:01:25,00:02:59', '00:03:25,00:04:39'], 分段剪辑通过识别该参数执行精剪
+    * （new2）【视频分段剪辑功能 -- 新增精剪方案】：upload_config_files\ 目录下配置文件中的 video_file_config_list 里新增参数 'paragraph_time_list': ['00:01:25,00:02:59', '00:03:25,00:04:39'], 分段剪辑通过识别该参数执行精剪
+    * （new3）【视频上传配置参数中增加参数 -- 转载视频来源】：upload_config_files\ 目录下配置文件中的 video_file_config_list 里新增参数 'video_source': 'xxx.xxx.xxx'，之前没有使用过转载功能，这次使用转载功能时，发现被要求必须填写视频来源，所以这次补充了该功能，在自动上传的时候，若选择的类型是'转载'，则会自动往'来源'一栏里填写 'video_source' 的参数值
 
 ## 附加说明
 * 
