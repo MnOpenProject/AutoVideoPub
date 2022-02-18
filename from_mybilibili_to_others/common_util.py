@@ -263,7 +263,7 @@ def read_uploaded_remember_to_judge_isuploaded(upload_file_name):
         if remember_line == upload_file_name:
             log_print(f'-- 视频 【{upload_file_name}】 存在上传记录 ---')
             return True
-    log_print(f'{upload_file_name} --> 没有上传记录')
+    # log_print(f'{upload_file_name} --> 没有上传记录')
     return False
 
 # 编辑发布时发生错误异常的视频文件，则存储记录时会打上这个错误记号(后缀)
