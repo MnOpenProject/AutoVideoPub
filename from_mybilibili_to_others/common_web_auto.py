@@ -8,7 +8,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 # from selenium.webdriver.edge.options import Options as EdgeOptions
 from msedge.selenium_tools import EdgeOptions
 from msedge.selenium_tools import Edge
-from .common_config import __CURPATH__,cookie_txt_path,bilibili_request_headers,personal_info_path,cookie_xiaohongshu_txt_path
+from .common_config import __CURPATH__,cookie_txt_path,bilibili_request_headers,personal_info_path,cookie_xiaohongshu_txt_path,edge_driver_headless
 from .common_util import force_sleep, get_personal_info_module,write_blibli_cookie_into_txt,read_blibli_cookie_from_txt,check_bilibili_cookie_validity,read_xiaohongshu_cookie_from_txt,check_xiaohongshu_cookie_validity,write_xiaohongshu_cookie_into_txt
 import os,requests
 
@@ -41,6 +41,9 @@ def create_dege_driver(init_url):
     # 防止打印一些无用的日志
     edge_options.add_experimental_option("excludeSwitches", ['enable-automation', 'enable-logging'])
     edge_options.use_chromium = True
+    if edge_driver_headless:
+        # 设置无头模式
+        edge_options.add_argument('--headless')
     edge_options.add_argument('--disable-blink-features=AutomationControlled') # 解决Edge浏览器对selenium的检测问题
     # edge_options.add_argument("--disable-infobars")
     driver = Edge(driver_path,options=edge_options)
