@@ -1,8 +1,8 @@
 ''' 参考资料：https://www.bilibili.com/read/cv9646821/ '''
 import os,requests,progressbar
 from .collect_aid_data import main_func as collect_need_aid_data
-from .common_config import ffmpeg_bin_dir,download_file_dir,covert_file_dir,video_download_exclude_txt,video_upload_menu_xiaohongshu_txt_name
-from .common_util import is_int_str,input_selection,is_in_exclude_txt,get_video_name_by_title,create_upload_video_menu
+from .common_config import ffmpeg_bin_dir,download_file_dir,covert_file_dir,video_download_exclude_txt,video_upload_menu_xiaohongshu_txt_name,is_download_uploaded_video
+from .common_util import is_int_str,input_selection,is_in_exclude_txt,get_video_name_by_title,create_upload_video_menu,read_uploaded_remember_to_judge_isuploaded
 
 class Bilibili_Video_Getter:
     def open_url(self, url):
@@ -228,6 +228,10 @@ def download_and_convert2mp4():
 def download_video():
     # 这里填入要下载视频的 aid 值，然后在该目录下执行该脚本
     aid_list = collect_need_aid_data()
+    # 下载视频时，是否排除已上传的视频(可在全局配置脚本里 common_config.py 根据自己的情况进行修改控制)
+    if not is_download_uploaded_video:
+        # 过滤掉已经上传过的视频
+        aid_list = [i for i in aid_list if not read_uploaded_remember_to_judge_isuploaded(i['title'])]
     for aid_item in aid_list:
         video_getter.main(str(aid_item['aid']),download_file_dir,covert_file_dir,False)
 
