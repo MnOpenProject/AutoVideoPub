@@ -13,9 +13,9 @@ mobile_storage_folder = 'autopy_for_bijian'
 # 分解视频或合并视频 的 文件类型(.ts .mp4 等)
 video_file_Format = ".mp4"
 
-# 爬视频的脚本配置文件的所在目录（文件夹名称）
+# 下载视频的脚本配置文件的所在目录（文件夹名称）
 video_py_file_root_dir = 'video_vars_dandanzan'
-# 已爬取到的视频文件的所在目录（文件夹名称）
+# 已下载取到的视频文件的所在目录（文件夹名称）
 video_download_file_root_dir = 'downloadvideo'
 # 每个输出片段的最短时长（单位：分钟）（如果实际生成视频时，计算出的实际分段视频时长小于该值，则不会进行输出视频文件）
 paragraph_min_long_m = 1

@@ -92,7 +92,7 @@
 
     *【特别说明】：更多功能，请自行研究，兴许实力强大的你会有更多好用的功能去实现
 
-# 新增功能（new）
+## 新增功能（new）
 * 【视频说明链接】：https://www.bilibili.com/video/BV1334y117pw/
     * （new1）【视频集锦制作】：可以把本地已有的多个分段视频进行自由组合成一个完整的集锦视频(即 auto_clip_video_byandroid\video\ 目录下的视频文件)，并进行自动上传，这比单纯上传一个单一的分段视频更好些，使用者可以按程序的命名规则手动在 auto_clip_video_byandroid\video\ 目录下放置自己的过渡视频文件，如此可以让集锦视频有了过渡画面，避免不同的视频片段变换僵硬的问题
     * 使用说明：
@@ -105,6 +105,11 @@
     * * 随后便可以自由输入自己想要组合的片段序号，回车即可得到合并后的集锦视频文件，同样是输出在 auto_clip_video_byandroid\video\ 目录下
     * （new2）【视频分段剪辑功能 -- 新增精剪方案】：upload_config_files\ 目录下配置文件中的 video_file_config_list 里新增参数 'paragraph_time_list': ['00:01:25,00:02:59', '00:03:25,00:04:39'], 分段剪辑通过识别该参数执行精剪
     * （new3）【视频上传配置参数中增加参数 -- 转载视频来源】：upload_config_files\ 目录下配置文件中的 video_file_config_list 里新增参数 'video_source': 'xxx.xxx.xxx'，之前没有使用过转载功能，这次使用转载功能时，发现被要求必须填写视频来源，所以这次补充了该功能，在自动上传的时候，若选择的类型是'转载'，则会自动往'来源'一栏里填写 'video_source' 的参数值
+
+## 新模块发布（new） 
+* 
+    * 【from_mybilibili_to_others】模块可实现 -- 下载自己<B站 稿件管理 已审核>的投稿视频，并自动处理后，自动上传到自己账号登录的其他视频平台上
+    * * 具体说明请查看模块下的说明文件： /from_mybilibili_to_others/README.md
 
 ## 附加说明
 * 

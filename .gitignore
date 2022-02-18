@@ -11,3 +11,18 @@ auto_clip_video_byandroid/video
 auto_clip_video_byandroid/logs
 auto_clip_video_byandroid/screen_shot
 auto_clip_video_byandroid/collection_remember
+
+# from_mybilibili_to_others
+from_mybilibili_to_others/request_video_all
+# from_mybilibili_to_others/upload_remember
+# from_mybilibili_to_others/video_exclude
+# from_mybilibili_to_others/video_redeal_config
+# from_mybilibili_to_others/video_upload_menu
+from_mybilibili_to_others/video_flv
+from_mybilibili_to_others/video_mp4
+from_mybilibili_to_others/logs
+from_mybilibili_to_others/video_tsfiles
+from_mybilibili_to_others/video_new_mp4
+from_mybilibili_to_others/personal_info.py
+from_mybilibili_to_others/b_cookie.txt
+from_mybilibili_to_others/xhs_cookie.txt
