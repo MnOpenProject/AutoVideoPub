@@ -174,7 +174,7 @@ def upload_video_one(driver:Edge,video_file_path,video_config):
     # 检查是否存在刚发布的视频数据
     if check_upload_success(upload_title):
         # 发布成功后，视频名称记录到本地文档，以供后续查询
-        write_uploaded_remember_txt(video_file_path)
+        write_uploaded_remember_txt(video_file_name)
     else: # 若发布数据里不存在刚发布的视频，则重新发布该条视频
         force_sleep(10)
         driver.get(xiaohongshu_clip_tool_url)

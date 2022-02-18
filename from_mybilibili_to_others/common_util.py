@@ -277,7 +277,7 @@ def write_uploaded_remember_txt(upload_file_name,error_file=False):
 
     # 如果是编辑发布时发生错误异常的视频文件，则存储记录时会打上错误记号(后缀)
     error_suffix = '' if error_file == False else error_suffix_flag
-    # 每一行记录的名称，都跟要上传的视频分段文件名称保持一致，这样方便读取的时候可以直接进行比对
+    # 每一行记录的名称，都跟要上传的视频文件名称保持一致，这样方便读取的时候可以直接进行比对
     upload_file_path = f'{upload_file_name}{error_suffix}'
     
     # 如果记录已存在，那么不再重复记录
@@ -285,7 +285,7 @@ def write_uploaded_remember_txt(upload_file_name,error_file=False):
         return
     f_path = upload_rember_xhs_txt_path
     # 写入文本
-    # 每一行记录的名称，都跟要上传的视频分段文件名称保持一致，这样方便读取的时候可以直接进行比对
+    # 每一行记录的名称，都跟要上传的视频文件名称保持一致，这样方便读取的时候可以直接进行比对
     str_content = upload_file_path
     fp = open(f_path,"a",encoding="utf-8") # 以追加模式写入
     fp.write('{0}\n'.format(str_content))
