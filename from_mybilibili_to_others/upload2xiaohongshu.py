@@ -15,7 +15,7 @@ from selenium.webdriver.chrome.options import Options
 from msedge.selenium_tools import EdgeOptions
 from msedge.selenium_tools import Edge
 from selenium.webdriver.common.action_chains import ActionChains
-from .common_config import __CURPATH__, video_new_dir,video_upload_menu_xiaohongshu_txt_name,xiaohongshu_request_headers
+from .common_config import __CURPATH__, video_new_dir,video_upload_menu_xiaohongshu_txt_name,xiaohongshu_request_headers,upload_default_topics
 from .common_util import force_sleep,log_print as cm_log_print,write_uploaded_remember_txt,read_upload_video_menu,get_video_source_title_by_name,read_uploaded_remember_to_judge_isuploaded
 from .common_web_auto import xiaohongshu_clip_tool_url,create_dege_driver,edge_xiaohongshu_login_by_phone,read_xiaohongshu_cookie,add_cookie_item_into_web
 
@@ -24,7 +24,7 @@ from .common_web_auto import xiaohongshu_clip_tool_url,create_dege_driver,edge_x
 
 clip_tool_url = xiaohongshu_clip_tool_url
 # 点击发布按钮前的等待时长（单位：秒），避免视频没有上传完成
-pub_wait_sec = 10
+pub_wait_sec = 30
 # 请求头
 my_request_headers = xiaohongshu_request_headers
 
@@ -39,10 +39,19 @@ def login_by_phone():
 
 # 输入描述前面的话题
 # 在 [描述]栏的最前面填写[话题]功能（注：这个话题功能一定要先填写在[描述]的最前面）
-# （话题默认规则特别说明：如果数组中存在空字符串，比如 [''] 这样的数组，那么后续填写话题时，点击一下<话题>按钮，在对空字符串回车的情况下，小红书会根据标题自动识别出合适的话题）
+# 【这种方案取决于简述智能视频做的好不好，测试下来不行会出现不合理的情况，所以放弃该方案】（话题默认规则特别说明：如果数组中存在空字符串，比如 [''] 这样的数组，那么后续填写话题时，点击一下<话题>按钮，在对空字符串回车的情况下，小红书会根据标题自动识别出合适的话题）
+# 【默认情况下，使用全局设置的话题变量，在 common_config.py 下可以自行修改】
 def input_topic_into_el(upload_topic_list):
     # 去重，避免输入相同话题
     upload_topic_list = list(set(upload_topic_list))
+    # 排除空字符串
+    upload_topic_list = [i for i in upload_topic_list if not str(i).replace(' ','') == '']
+    if len(upload_topic_list) < 1:
+        default_topics = str(upload_default_topics).replace('，',',')
+        upload_topic_list = default_topics.split(',')
+        # 排除空字符串
+        upload_topic_list = [i for i in upload_topic_list if not str(i).replace(' ','') == '']
+
     log_print(f'话题：upload_topic_list => {upload_topic_list}')
     # 为了等待异步加载数据，控制个间隔时间
     span_wait_sec = 1
@@ -132,7 +141,10 @@ def upload_video_one(driver:Edge,video_file_path,video_config):
     # 只需要写话题文字即可，若多个话题，用英文逗号隔开即可，比如 搞笑,动画,...，若为空则使用默认规则填写
     upload_topic_list = str(video_config['upload_topic']).replace('，',',').split(',') # 避免出现中文逗号的错误情况，提前把中文逗号替换成英文逗号
     # 上传视频的[描述栏]填写规则：先读取配置参数，若配置参数为空，则使用默认规则
-    upload_desc = video_config['upload_desc']
+    upload_desc = str(video_config['upload_desc'])
+    if upload_desc.replace(' ','') == '':
+        # 默认情况下，使用原始视频的标题(title)作为内容
+        upload_desc = get_video_source_title_by_name(video_file_name)
 
     # 把视频文件输入到上传按钮中，执行上传视频操作
     upload_input = driver.find_element_by_class_name('upload-input')
@@ -147,12 +159,20 @@ def upload_video_one(driver:Edge,video_file_path,video_config):
     # 由于 [话题] 也在 [描述栏里]，总字数不可超过 1000 所以描述的内容要进行一定控制
     # 由于 [话题] 的格式比较特殊，比如"影视"是2个字，变成话题后字数实际是5个字(加了#号和空格以及一个隐藏字符)，也就是说，话题实际所占字数为：原字数+3
     # 所以话题所占字数计算公式为：话题实际字数占位 = 纯字数 + (话题个数 * 3)
-    topic_len = len(str(video_config['upload_topic']).replace(',','')) + (len(upload_topic_list) * 3)
+    upload_topic__ = str(video_config['upload_topic'])
+    if upload_topic__.replace(' ','') == '':
+        upload_topic__ = upload_default_topics
+    topic_len = len(upload_topic__.replace(' ','').replace(',','')) + (len([i for i in upload_topic__.split(',') if not i == '']) * 3)
+    log_print(f'topic_len = {topic_len}')
     # 那么剩余 [描述内容] 可填写的字数就如下
     desc_constent_max = desc_total_max - topic_len
+    log_print(f'desc_constent_max = {desc_constent_max}')
+    log_print(f'upload_desc = {upload_desc}')
+    log_print('len(upload_desc) = {}'.format(len(upload_desc)))
     # 若字数超出，则截取其中一定长度的文字，并追加省略号 ...
     if len(upload_desc) > desc_constent_max:
         upload_desc = upload_desc[:desc_total_max - 10] + '...'
+    log_print(f'输入的描述内容：\n{upload_desc}')
     upload_desc_input = driver.find_element_by_xpath('//*[@id="post-textarea"]')
     upload_desc_input.send_keys(upload_desc)
     # 点击单选<公开>
@@ -208,6 +228,9 @@ def upload_videos():
                 except Exception as ex:
                     log_print(f'上传失败，发生异常：{ex}')
                     write_uploaded_remember_txt(video_file_name,True)
+                    force_sleep(6)
+                    driver.get(clip_tool_url)
+                    force_sleep(6)
 
 def upload2xiaohongshu():
     global driver

@@ -8,6 +8,8 @@ video_redeal_rm_ht_time_long = '00:00:00,00:00:10' #'00:00:00,00:00:10'
 is_download_uploaded_video = False
 # 分解和重组视频时，是否排除已上传的视频(可在全局配置脚本里 common_config.py 根据自己的情况进行修改控制)
 is_splitcombine_uploaded_video = False
+# 上传视频时，默认使用的[话题] (若需要设置多个，则逗号隔开即可（一定要用英文格式的逗号），比如 游戏,影视)
+upload_default_topics = '游戏'
 
 ''' --------------- 使用者可能有特殊需求，可修改的参数 end --------------- '''
 
