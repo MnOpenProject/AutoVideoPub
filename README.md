@@ -114,3 +114,7 @@
 ## 附加说明
 * 
     * 【auto_clip_video_byandroid\logs\ 目录说明】：在使用过程中终端打印的内容会也会在该目录下生成相应的 .log 日志文件，为了方便调试，如果不想输出，则修改 \auto_clip_video_byandroid\config\connection_config.py 中的 out_log_file 变量为 False 即可
+
+## 使用声明
+* 
+    * 本项目遵照MIT协议开放源代码，使用时请务必遵循相关协议，切勿违法法律道德，切勿影响他人利益，否则一切后果请自行承担与本项目作者无关
