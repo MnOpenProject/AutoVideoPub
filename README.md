@@ -109,7 +109,7 @@
 ## 新模块发布（new） 
 * 
     * 【from_mybilibili_to_others】模块可实现 -- 下载自己<B站 稿件管理 已审核>的投稿视频，并自动处理后，自动上传到自己账号登录的其他视频平台上
-    * * 具体说明请查看模块下的说明文件： /from_mybilibili_to_others/README.md
+    * * 具体说明请查看模块下的说明文件： ./from_mybilibili_to_others/README.md
 
 ## 附加说明
 * 
