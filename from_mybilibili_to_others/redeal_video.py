@@ -2,8 +2,8 @@
 ''' 输出到 video_new_mp4/ 目录下 '''
 
 import os
-from .common_config import ffmpeg_bin_dir,covert_file_dir,tsfiles_root_dir,video_new_dir,video_redeal_rm_ht_time_long
-from .common_util import del_files,get_duration_from_ffmpeg,log_print as cm_log_print,read_redeal_config
+from .common_config import ffmpeg_bin_dir,covert_file_dir,tsfiles_root_dir,video_new_dir,video_redeal_rm_ht_time_long,is_splitcombine_uploaded_video
+from .common_util import is_in_exclude_txt,get_duration_from_ffmpeg,log_print as cm_log_print,read_redeal_config,read_uploaded_remember_to_judge_isuploaded
 from .split_tsfiles_by_ffmpeg import video_split_tsfiles_by_ffmpeg
 from .combine_ts_by_ffmpeg import combine_ts_by_ffmpeg
 
@@ -13,6 +13,13 @@ def log_print(content_str):
 def split_video_to_tsfiles():
     video_file_dir = covert_file_dir
     video_files = os.listdir(video_file_dir)
+    # 排除存在于 video_exclude/video_exclude.txt 中的视频
+    video_files = [i for i in video_files if not is_in_exclude_txt(i)]
+    # 分解和重组视频时，是否排除已上传的视频(可在全局配置脚本里 common_config.py 根据自己的情况进行修改控制)
+    if not is_splitcombine_uploaded_video:
+        # 过滤掉已经上传过的视频
+        video_files = [i for i in video_files if not read_uploaded_remember_to_judge_isuploaded(str(i).replace('.mp4',''))]
+    log_print(f'此次要分解的视频如下：\n{video_files}')
     if len(video_files) > 0:
         for video_file_full_name in video_files:
             # video_file_path = f'{video_file_dir}/{video_file_name}'
@@ -30,6 +37,13 @@ def recombine2new():
     rm_end_time_long = rm_ht_time_long_list[1] # 要裁剪去掉的 结尾时长
     
     tsfiles_video_dir_list = os.listdir(tsfiles_root_dir) # video_tsfiles/ 目录下的子目录(节目文件夹)列表
+    # 排除存在于 video_exclude/video_exclude.txt 中的视频
+    tsfiles_video_dir_list = [i for i in tsfiles_video_dir_list if not is_in_exclude_txt(i)]
+    # 分解和重组视频时，是否排除已上传的视频(可在全局配置脚本里 common_config.py 根据自己的情况进行修改控制)
+    if not is_splitcombine_uploaded_video:
+        # 过滤掉已经上传过的视频
+        tsfiles_video_dir_list = [i for i in tsfiles_video_dir_list if not read_uploaded_remember_to_judge_isuploaded(i)]
+    log_print(f'此次要重组的视频如下：\n{tsfiles_video_dir_list}')
     if len(tsfiles_video_dir_list) > 0:
         for video_name_dir in tsfiles_video_dir_list:
             # 先获取原始视频文件的时长，从而通过减去 rm_end_sec_total(要裁剪去掉的视频结尾时长) 来计算出 当前要收集的 .ts 切片文件的 结束时刻
