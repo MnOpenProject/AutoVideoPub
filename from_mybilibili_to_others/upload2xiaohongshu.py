@@ -144,9 +144,9 @@ def upload_video_one(driver:Edge,video_file_path,video_config):
     # 上传视频的[描述栏]填写规则：先读取配置参数，若配置参数为空，则使用默认规则
     upload_desc = str(video_config['upload_desc'])
     if upload_desc.replace(' ','') == '':
-        if not upload_title.replace(' ','') == '':
+        if not str(video_config['upload_title']).replace(' ','') == '':
             # 若本视频已设置的独立的 上传标题，那有限默认使用上传标题
-            upload_desc = upload_title
+            upload_desc = str(video_config['upload_title'])
         else:
             # 否则，默认情况下，使用原始视频的标题(title)作为内容
             upload_desc = get_video_source_title_by_name(video_file_name)
