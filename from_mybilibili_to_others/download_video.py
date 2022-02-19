@@ -1,8 +1,9 @@
 ''' 参考资料：https://www.bilibili.com/read/cv9646821/ '''
 import os,requests,progressbar
+from time import sleep
 from .collect_aid_data import main_func as collect_need_aid_data
 from .common_config import ffmpeg_bin_dir,download_file_dir,covert_file_dir,video_download_exclude_txt,video_upload_menu_xiaohongshu_txt_name,is_download_uploaded_video
-from .common_util import is_int_str,input_selection,is_in_exclude_txt,get_video_name_by_title,create_upload_video_menu,read_uploaded_remember_to_judge_isuploaded
+from .common_util import is_int_str,input_selection,is_in_exclude_txt,get_video_name_by_title,create_upload_video_menu, log_print,read_uploaded_remember_to_judge_isuploaded
 
 class Bilibili_Video_Getter:
     def open_url(self, url):
@@ -210,6 +211,17 @@ video_getter = Bilibili_Video_Getter()
 def create_xiaohongshu_upload_video_menu():
     create_upload_video_menu(video_upload_menu_xiaohongshu_txt_name)
 
+# 整理出要下载的视频数据
+def get_need_download_video_data():
+    # 获取要下载的 aid 数据
+    aid_list = collect_need_aid_data()
+    # 下载视频时，是否排除已上传的视频(可在全局配置脚本里 common_config.py 根据自己的情况进行修改控制)
+    if not is_download_uploaded_video:
+        # 过滤掉已经上传过的视频
+        aid_list = [i for i in aid_list if not read_uploaded_remember_to_judge_isuploaded(i['title'])]
+    log_print(f'此次要下载的视频：\n{aid_list}')
+    return aid_list
+
 def download_and_convert2mp4():
     # aid 来源：打开一个视频页面链接，然后 F12 打开 Debug 窗口，
     # 在 Network 画面里的 Fetch/XHR 里仔细查找一个类似这样的请求 https://api.bilibili.com/x/player/online/total?aid=680930025&cid=493892120&bvid=BV1tS4y1L7nz&ts=54815817
@@ -218,7 +230,7 @@ def download_and_convert2mp4():
     # aid案例 = 680930025
 
     # 这里填入要下载视频的 aid 值，然后在该目录下执行该脚本
-    aid_list = collect_need_aid_data() # 请求<B站 我的稿件> 已通过审核的 数据列表
+    aid_list = get_need_download_video_data() # 请求<B站 我的稿件> 已通过审核的 数据列表
     for aid_item in aid_list:
         video_getter.main(str(aid_item['aid']),download_file_dir,covert_file_dir)
     
@@ -226,12 +238,8 @@ def download_and_convert2mp4():
     create_upload_video_menu(video_upload_menu_xiaohongshu_txt_name)
 
 def download_video():
-    # 这里填入要下载视频的 aid 值，然后在该目录下执行该脚本
-    aid_list = collect_need_aid_data()
-    # 下载视频时，是否排除已上传的视频(可在全局配置脚本里 common_config.py 根据自己的情况进行修改控制)
-    if not is_download_uploaded_video:
-        # 过滤掉已经上传过的视频
-        aid_list = [i for i in aid_list if not read_uploaded_remember_to_judge_isuploaded(i['title'])]
+    # 获取要下载的 aid 数据
+    aid_list = get_need_download_video_data()
     for aid_item in aid_list:
         video_getter.main(str(aid_item['aid']),download_file_dir,covert_file_dir,False)
 

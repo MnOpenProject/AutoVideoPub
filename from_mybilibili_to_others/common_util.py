@@ -438,11 +438,13 @@ def create_upload_video_menu(txt_name):
     for v_title in upload_video_title_list:  #男士烫发[话题]# 
         # 读取视频的详细数据，若使用这不修改该文本，那上传视频的时候就会使用到这里默认设置的来自B站上发布视频的信息
         v_data = read_video_detail_data(v_title)
-        dynamic_str = '' if str(v_data['dynamic']).replace(' ','') == '' else f" ----- {v_data['dynamic']}"
-        upload_desc = '{0}{1}'.format(v_data['desc'],dynamic_str)
+        v_data_item = {'title':'','desc':'','dynamic':''} if len(v_data) < 1 else v_data[0]
+        # dynamic_str = '' if str(v_data_item['dynamic']).replace(' ','').replace('-','') == '' else f" ----- {v_data_item['dynamic']}"
+        # upload_desc = '{0}{1}'.format(v_data_item['desc'],dynamic_str)
+        upload_desc = v_data_item['desc']
         v_item = {
             'title': v_title, # 下载视频时保存的title
-            'upload_title': v_data['title'], # 上传时，[标题栏]里填写的内容（需使用者自行编写，若为空则使用默认规则填写）
+            'upload_title': v_data_item['title'], # 上传时，[标题栏]里填写的内容（需使用者自行编写，若为空则使用默认规则填写）
             'upload_topic': '', # 上传时，[描述栏]里最前面#标注的[话题]（需使用者自行编写，只需要写话题文字即可，若多个话题，用英文逗号隔开即可，比如 搞笑,动画,...，若为空则使用默认规则填写）
             'upload_desc':  upload_desc # 上传时，[描述栏]里填写的内容（需使用者自行编写，若为空则使用默认规则填写）
         }
