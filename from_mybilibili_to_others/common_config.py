@@ -12,7 +12,7 @@ video_data_request_page_num = 1
 # 重新处理视频时，ffmpeg 分解视频为 .ts 切片文件时，设定的一个 .ts 文件的时长（单位：秒）
 video_ts_unit_long_s = 1
 # 重新处理视频时，需要选取的视频的时间范围 '需要减去的开头时长,需要减去的结尾时长'
-video_redeal_rm_ht_time_long = '00:00:00,00:00:7' #'00:00:00,00:00:10'
+video_redeal_rm_ht_time_long = '00:00:00,00:00:07' #'00:00:00,00:00:10'
 # 下载视频时，是否排除已上传的视频
 is_download_uploaded_video = False
 # 分解和重组视频时，是否排除已上传的视频(可在全局配置脚本里 common_config.py 根据自己的情况进行修改控制)

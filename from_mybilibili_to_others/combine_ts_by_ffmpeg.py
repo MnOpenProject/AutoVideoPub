@@ -32,7 +32,7 @@ def write_tslist_into_txt(filelist_path,ts_file_list):
         fp.close()  
 
 def combine_ts_by_ffmpeg(tsvideoRoot, ts_file_list, saveFileDir, saveFilePath, log_print):
-    tsvideoRoot = tsvideoRoot.replace('/','\\')
+    # tsvideoRoot = tsvideoRoot.replace('/','\\')
     # tsFileDir = tsFileDir.replace('/','\\')
     saveFilePath = saveFilePath.replace('/','\\')
     # drive 参数是设定的输出的磁盘
@@ -48,7 +48,13 @@ def combine_ts_by_ffmpeg(tsvideoRoot, ts_file_list, saveFileDir, saveFilePath, l
     # ts_file_list = [i for i in ts_dir_file_list if sourceFormat in i]
     # ts_file_list = bubbleSortTsFile(ts_file_list)
     log_print('准备合并的文件列表----------------------------')
-    log_print(ts_file_list)
+    # 对 .ts 文件列表进行排序，确保按照从小到大 1.ts,2.ts,3.ts,.. 的规则有序排列，否则会造成重组视频发生混乱（重组视频会按照该列表的顺序把视频依次重组）
+    ts_file_name_list = [str(i).replace(f'{tsvideoRoot}/','') for i in ts_file_list]
+    log_print(f'ts_file_name_list：\n{ts_file_name_list}')
+    ts_file_name_list = bubbleSortTsFile(ts_file_name_list)
+    ts_file_list = [f'{tsvideoRoot}/{i}' for i in ts_file_name_list] # 为 ts_file_list 参数附上重新排序后的新数组
+    log_print(f'ts_file_list\n{ts_file_list}')
+
     # 把要合并的所有 .ts 文件都预先排列好的写入到一个 txt 文件中
     filelist_path = '{0}/{1}'.format(saveFileDir,filelist_name)
     log_print('把要合并的所有 .ts 文件都预先排列好的写入到一个 txt 文件中----------------------------')
@@ -62,4 +68,4 @@ def combine_ts_by_ffmpeg(tsvideoRoot, ts_file_list, saveFileDir, saveFilePath, l
     log_print("{}视频合成完成".format(saveFilePath))
     
     # 移除合并文件时，临时使用的 filelist.txt 文件
-    os.remove(filelist_path)
+    # os.remove(filelist_path)
