@@ -68,4 +68,4 @@ def combine_ts_by_ffmpeg(tsvideoRoot, ts_file_list, saveFileDir, saveFilePath, l
     log_print("{}视频合成完成".format(saveFilePath))
     
     # 移除合并文件时，临时使用的 filelist.txt 文件
-    # os.remove(filelist_path)
+    os.remove(filelist_path)
