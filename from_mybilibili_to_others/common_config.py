@@ -10,7 +10,6 @@ edge_driver_headless = False
 video_request_all_page = True # 该开关设置为 True 时会逐页查询所有页码的数据,设置为 False 时，在 coolect_aid_data.py 里请求数据时，便会只查询 video_data_request_page_num 变量控制的页码的数据
 video_data_request_page_num = 1
 # 重新处理视频时，ffmpeg 分解视频为 .ts 切片文件时，设定的一个 .ts 文件的时长（单位：秒）
-# 最好不要设置太小，否则会发现视频分解时有空的情况，重组的时候视频会出现缺帧的情况
 video_ts_unit_long_s = 1
 # 重新处理视频时，需要选取的视频的时间范围 '需要减去的开头时长,需要减去的结尾时长'
 video_redeal_rm_ht_time_long = '00:00:00,00:00:07' #'00:00:00,00:00:10'
