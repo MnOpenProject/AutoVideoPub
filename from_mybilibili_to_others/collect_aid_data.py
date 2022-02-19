@@ -53,7 +53,8 @@ def collect_aid_data():
                     'title': get_video_name_by_title(arc_item['Archive']['title']),
                     'datetime': timestamp2datetime(arc_item['Archive']['ptime']),
                     'desc': str(arc_item['Archive']['desc']),
-                    'dynamic': str(arc_item['Archive']['desc'])
+                    'dynamic': str(arc_item['Archive']['desc']),
+                    'cover': str(arc_item['Archive']['cover'])
                 }
                 # 排除 title 相同的视频资源
                 find_list = [i for i in aid_data if i['title'] == aid_data_item['title']]

@@ -1,8 +1,8 @@
 from time import sleep
 from datetime import datetime
-from .common_config import __CURPATH__,request_all_video_remember_dir,video_redeal_config_dir,video_download_exclude_txt,video_upload_menu_dir,personal_info_py_name,personal_info_path,cookie_txt_path,bilibili_request_headers,cookie_xiaohongshu_txt_path,xiaohongshu_request_headers,logs_out_dir,download_file_dir,covert_file_dir,tsfiles_root_dir,video_new_dir,request_remember_txt_name,request_remember_data_name
+from .common_config import __CURPATH__,request_all_video_remember_dir,video_redeal_config_dir,video_download_exclude_txt,video_upload_menu_dir,personal_info_py_name,personal_info_path,cookie_txt_path,bilibili_request_headers,cookie_xiaohongshu_txt_path,xiaohongshu_request_headers,logs_out_dir,download_file_dir,covert_file_dir,tsfiles_root_dir,video_new_dir,request_remember_txt_name,request_remember_data_name,video_cover_from_bili_dir
 import eventlet,os,importlib
-import ffmpy3,json,subprocess,shutil,requests
+import ffmpy3,json,subprocess,shutil,requests,urllib.request
 
 ''' ------------------- 移除所有自动创建的文件夹和文件 start -------------------'''
 
@@ -418,6 +418,16 @@ def get_video_upload_init_data():
 
     return upload_video_title_list
 
+# 保存封面图片到本地，并范围保存的绝对路径
+def download_cover_to_local(img_url,save_file_name):
+    if not os.path.exists(video_cover_from_bili_dir):
+        os.makedirs(video_cover_from_bili_dir)
+    # 从 url 里截取图片后缀
+    img_suffix = os.path.splitext(img_url)[1]
+    save_file_path = f'{video_cover_from_bili_dir}/{save_file_name}{img_suffix}'
+    urllib.request.urlretrieve(img_url,filename=save_file_path)
+    return save_file_path
+
 # 输出一份视频上传菜单（后续的上传视频操作会根据该菜单中的顺序依次上传视频）
 # 在上传之前如果需要修改顺序，可以修改该菜单后，再执行自动上传操作
 def create_upload_video_menu(txt_name):
@@ -435,21 +445,26 @@ def create_upload_video_menu(txt_name):
     # 使用者在上传之前编辑想要填写的内容，上传时会根据其中的参数，在对应的栏位填写对应的内容
     # （如果其中的内容为空，则上传时会默认使用默认的规则进行填写，具体规则需要在上传脚本里查看对应的注释）
     upload_json_list = []
-    for v_title in upload_video_title_list:  #男士烫发[话题]# 
+    for v_title in upload_video_title_list:
         # 读取视频的详细数据，若使用这不修改该文本，那上传视频的时候就会使用到这里默认设置的来自B站上发布视频的信息
         v_data = read_video_detail_data(v_title)
-        v_data_item = {'title':'','desc':'','dynamic':''} if len(v_data) < 1 else v_data[0]
+        v_data_item = {'title':'','desc':'','dynamic':'','cover':''} if len(v_data) < 1 else v_data[0]
         # dynamic_str = '' if str(v_data_item['dynamic']).replace(' ','').replace('-','') == '' else f" ----- {v_data_item['dynamic']}"
         # upload_desc = '{0}{1}'.format(v_data_item['desc'],dynamic_str)
         upload_desc = v_data_item['desc']
         # 这一步操作是因为B站数据的 desc 描述字段如果没有填，会是 '-' 这样的横杠，需要进行替换处理成空字符串
         upload_desc = '' if upload_desc.replace('-','') == '' else upload_desc
+        # 来自B站的视频封面图片
+        # 下载封面图片保存到本地
+        upload_cover = str(v_data_item['cover'])
+        upload_cover = download_cover_to_local(upload_cover,v_title)
         # 整理成 json 对象
         v_item = {
             'title': v_title, # 下载视频时保存的title
             'upload_title': v_data_item['title'], # 上传时，[标题栏]里填写的内容（需使用者自行编写，若为空则使用默认规则填写）
             'upload_topic': '', # 上传时，[描述栏]里最前面#标注的[话题]（需使用者自行编写，只需要写话题文字即可，若多个话题，用英文逗号隔开即可，比如 搞笑,动画,...，若为空则使用默认规则填写）
-            'upload_desc':  upload_desc # 上传时，[描述栏]里填写的内容（需使用者自行编写，若为空则使用默认规则填写）
+            'upload_desc':  upload_desc, # 上传时，[描述栏]里填写的内容（需使用者自行编写，若为空则使用默认规则填写）
+            'upload_cover': upload_cover
         }
         upload_json_list.append(json.dumps(v_item,ensure_ascii=False))
     # 倒序排列一下(这样可以使得上传视频时，默认从最早的一期视频开始上传)

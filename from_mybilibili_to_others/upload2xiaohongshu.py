@@ -70,28 +70,29 @@ def input_topic_into_el(upload_topic_list):
             force_sleep(span_wait_sec) # 为了等待异步加载数据，控制个间隔时间
 
 # 编辑封面
-def edit_cover(driver:Edge):
+def edit_cover(driver:Edge,cover_img_file):
     # 点击按钮 <编辑封面>
     edit_cover_btn = driver.find_element_by_xpath('//*[@id="publish-container"]/div/div[2]/div[2]/div[2]/div[1]/div[1]')
     edit_cover_btn.click()
     force_sleep(2)
-    # 编辑封面弹窗显示后
-    # 截取封面 页签下，更改下方滑块元素的样式，实现想右侧滑动的功能
-    # 修改样式并不能达到修改封面的效果（该方案不行）
-    # driver.execute_script("document.querySelector('#cover-modal-0 > div > div > div.dyn.content.css-t0051x.css-y1z97h > div > div:nth-child(2) > div.css-1v3caum > div > div.list > ul > li.point').style.left='100px';")
-    # 通过控制鼠标，实现拖到滑块，实现修改封面(该方案测试下来也无效)
-    # slid_el = driver.find_element_by_xpath('//*[@id="cover-modal-0"]/div/div/div[2]/div/div[2]/div[2]/div/div[2]/ul/li[21]')
-    # # 将鼠标移动到滑块上
-    # mouse_action = ActionChains(driver)
-    # mouse_action.move_to_element(slid_el).perform()
-    # # 拖动滑块进行移动
-    # mouse_action.move_by_offset(100,0).perform() #move_by_offset以鼠标当前的位置为中心进行偏移，移动到距离当前位置(x,y)
 
-    # 最终测试发现，下方的条状是由一个一个 <li> 拼接而成的，只要点击其中一个 <li> 就能完美实现封面的切换功能了
-    cover_bar_li = driver.find_element_by_xpath('//*[@id="cover-modal-0"]/div/div/div[2]/div/div[2]/div[2]/div/div[2]/ul/li[7]')
-    cover_bar_li.click()
-    force_sleep(2)
-    
+    if str(cover_img_file).replace(' ','') == '':
+        # 【*】视频截取封面方案
+        # 最终测试发现，下方的条状是由一个一个 <li> 拼接而成的，只要点击其中一个 <li> 就能完美实现封面的切换功能了
+        cover_bar_li = driver.find_element_by_xpath('//*[@id="cover-modal-0"]/div/div/div[2]/div/div[2]/div[2]/div/div[2]/ul/li[7]')
+        cover_bar_li.click()
+        force_sleep(2)
+    else:
+        # 【*】使用来自B站的封面图片
+        # 切换页签 <上传封面>
+        cover_bar_li = driver.find_element_by_xpath('//*[@id="cover-modal-0"]/div/div/div[2]/div/div[2]/div[1]/div[2]')
+        cover_bar_li.click()
+        force_sleep(2)
+        # 把图片输入到上传栏位中
+        upload_cover_input = driver.find_element_by_xpath('//*[@id="cover-modal-0"]/div/div/div[2]/div/div[2]/div[3]/div[2]/input')
+        upload_cover_input.send_keys(cover_img_file)
+        force_sleep(2)
+
     # 点击按钮 <确定> (关闭编辑封面弹窗)
     cover_confirm_btn = driver.find_element_by_xpath('//*[@id="cover-modal-0"]/div/div/div[3]/div/button[2]/span')
     cover_confirm_btn.click()
@@ -143,8 +144,15 @@ def upload_video_one(driver:Edge,video_file_path,video_config):
     # 上传视频的[描述栏]填写规则：先读取配置参数，若配置参数为空，则使用默认规则
     upload_desc = str(video_config['upload_desc'])
     if upload_desc.replace(' ','') == '':
-        # 默认情况下，使用原始视频的标题(title)作为内容
-        upload_desc = get_video_source_title_by_name(video_file_name)
+        if not upload_title.replace(' ','') == '':
+            # 若本视频已设置的独立的 上传标题，那有限默认使用上传标题
+            upload_desc = upload_title
+        else:
+            # 否则，默认情况下，使用原始视频的标题(title)作为内容
+            upload_desc = get_video_source_title_by_name(video_file_name)
+    
+    # [视频封面]
+    cover_img_file = video_config['upload_cover']
 
     # 把视频文件输入到上传按钮中，执行上传视频操作
     upload_input = driver.find_element_by_class_name('upload-input')
@@ -182,7 +190,7 @@ def upload_video_one(driver:Edge,video_file_path,video_config):
     pubtime_atonce_radio = driver.find_element_by_xpath('//*[@id="publish-container"]/div/div[2]/div[2]/div[8]/div[5]/div[2]/label[1]')
     pubtime_atonce_radio.click()
     # 编辑封面
-    edit_cover(driver)
+    edit_cover(driver,cover_img_file)
 
     log_print(f'避免视频没有上传完成，等待 {pub_wait_sec} 秒后，再点击发布...')
     force_sleep(pub_wait_sec)

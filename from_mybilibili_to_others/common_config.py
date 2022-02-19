@@ -10,6 +10,7 @@ edge_driver_headless = False
 video_request_all_page = True # 该开关设置为 True 时会逐页查询所有页码的数据,设置为 False 时，在 coolect_aid_data.py 里请求数据时，便会只查询 video_data_request_page_num 变量控制的页码的数据
 video_data_request_page_num = 1
 # 重新处理视频时，ffmpeg 分解视频为 .ts 切片文件时，设定的一个 .ts 文件的时长（单位：秒）
+# 最好不要设置太小，否则会发现视频分解时有空的情况，重组的时候视频会出现缺帧的情况
 video_ts_unit_long_s = 1
 # 重新处理视频时，需要选取的视频的时间范围 '需要减去的开头时长,需要减去的结尾时长'
 video_redeal_rm_ht_time_long = '00:00:00,00:00:07' #'00:00:00,00:00:10'
@@ -86,6 +87,8 @@ request_remember_data_name = 'request_data_remember'
 # 每次请求 aid 数据时，也会把所有的视频的相关数据整理成一份配置（json 格式），存储到该目录下，然后在重新处理视频时(掐头去尾这类操作)，会从这里读取相应的配置参数
 video_redeal_config_dir = f'{__CURPATH__}/video_redeal_config'
 
+# 从B站上下载的视频封面图片存储目录
+video_cover_from_bili_dir = f'{__CURPATH__}/video_cover_from_bili'
 # 存放一份视频上传菜单的目录，上传视频时会根据该菜单文本中的顺序进行依次上传
 video_upload_menu_dir = f'{__CURPATH__}/video_upload_menu'
 # 上传到小红书平台时的菜单文本名称
