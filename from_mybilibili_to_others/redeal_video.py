@@ -2,7 +2,7 @@
 ''' 输出到 video_new_mp4/ 目录下 '''
 
 import os
-from .common_config import ffmpeg_bin_dir,covert_file_dir,tsfiles_root_dir,video_new_dir,video_redeal_rm_ht_time_long,is_splitcombine_uploaded_video
+from .common_config import ffmpeg_bin_dir,covert_file_dir,tsfiles_root_dir,video_new_dir,video_redeal_rm_ht_time_long,is_splitcombine_uploaded_video,video_ts_unit_long_s
 from .common_util import is_in_exclude_txt,get_duration_from_ffmpeg,log_print as cm_log_print,read_redeal_config,read_uploaded_remember_to_judge_isuploaded
 from .split_tsfiles_by_ffmpeg import video_split_tsfiles_by_ffmpeg
 from .combine_ts_by_ffmpeg import combine_ts_by_ffmpeg
@@ -26,7 +26,7 @@ def split_video_to_tsfiles():
             video_file_format = '.mp4'
             video_file_name = video_file_full_name.replace(video_file_format,'')
             # 先把视频分集成 .ts 切片文件
-            video_split_tsfiles_by_ffmpeg(video_file_dir,video_file_name,video_file_format)
+            video_split_tsfiles_by_ffmpeg(video_file_dir,video_file_name,video_file_format,video_ts_unit_long_s)
 
 # 掐头去尾，重组 .ts 文件成 新的 .mp4 文件
 def recombine2new():
