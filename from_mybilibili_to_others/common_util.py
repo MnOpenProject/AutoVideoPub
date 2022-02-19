@@ -442,6 +442,9 @@ def create_upload_video_menu(txt_name):
         # dynamic_str = '' if str(v_data_item['dynamic']).replace(' ','').replace('-','') == '' else f" ----- {v_data_item['dynamic']}"
         # upload_desc = '{0}{1}'.format(v_data_item['desc'],dynamic_str)
         upload_desc = v_data_item['desc']
+        # 这一步操作是因为B站数据的 desc 描述字段如果没有填，会是 '-' 这样的横杠，需要进行替换处理成空字符串
+        upload_desc = '' if upload_desc.replace('-','') == '' else upload_desc
+        # 整理成 json 对象
         v_item = {
             'title': v_title, # 下载视频时保存的title
             'upload_title': v_data_item['title'], # 上传时，[标题栏]里填写的内容（需使用者自行编写，若为空则使用默认规则填写）
