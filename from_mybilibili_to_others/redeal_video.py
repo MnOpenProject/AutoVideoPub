@@ -5,7 +5,7 @@ import os
 from .common_config import ffmpeg_bin_dir,covert_file_dir,tsfiles_root_dir,video_new_dir,video_redeal_rm_ht_time_long,is_splitcombine_uploaded_video,video_ts_unit_long_s
 from .common_util import is_in_exclude_txt,get_duration_from_ffmpeg,log_print as cm_log_print,read_redeal_config,read_uploaded_remember_to_judge_isuploaded
 from .split_tsfiles_by_ffmpeg import video_split_tsfiles_by_ffmpeg
-from .combine_ts_by_ffmpeg import combine_ts_by_ffmpeg
+from .combine_ts_by_ffmpeg import combine_ts_by_ffmpeg,bubbleSortTsFile
 
 def log_print(content_str):
     cm_log_print(content_str,'upload2xiaohongshu')
@@ -79,6 +79,10 @@ def recombine2new():
                 ts_duration_total_sec = 0 # 记录直到当前遍历到的 .ts 切片文件的总时长（以此来判定收集合适的 .ts 文件）
                 # 开始遍历 .ts 切片文件并收集
                 tsfile_list = os.listdir(tsfiles_dir)
+                # 收集数据之前，必须确保 tsfile_list 里的 .ts 文件时按从小到大的顺序依次排列的，不然下面的时长过滤算法就不可靠了，会导致.ts文件缺失的情况
+                tsfile_list = bubbleSortTsFile(tsfile_list)
+                log_print(f'bubbleSortTsFile(tsfile_list): \n{tsfile_list}')
+                # 开始根据头尾截取时长收集相应的 .ts 切片文件
                 source_video_duration_total_s = get_duration_from_ffmpeg(source_video_path)
                 # 保留2位小数
                 source_video_duration_total_s = round(float(source_video_duration_total_s),2)
@@ -96,7 +100,9 @@ def recombine2new():
                             collect_tsfile_list.append(tsfile_path)
                     saveFileDir = video_new_dir
                     saveFilePath = f'{saveFileDir}/{video_name_dir}.mp4'
-                    combine_ts_by_ffmpeg(tsfiles_dir,collect_tsfile_list,saveFileDir, saveFilePath, log_print)
+                    log_print(f'collect_tsfile_list: \n{collect_tsfile_list}')
+                    log_print(f'len(collect_tsfile_list): \n{len(collect_tsfile_list)}')
+                    combine_ts_by_ffmpeg(tsfiles_dir,video_name_dir,collect_tsfile_list,saveFileDir, saveFilePath, log_print)
                     
 def init_dirs():
     if not os.path.exists(video_new_dir):

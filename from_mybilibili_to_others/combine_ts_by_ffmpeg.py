@@ -8,7 +8,7 @@ def bubbleSortTsFile(arr):
     for i in range(n):
         # Last i elements are already in place
         for j in range(0, n-i-1):
-            if int(arr[j].replace('.ts','')) > int(arr[j+1].replace('.ts','')) :
+            if int(str(arr[j]).replace('.ts','')) > int(str(arr[j+1]).replace('.ts','')) :
                 arr[j], arr[j+1] = arr[j+1], arr[j]
     return arr
 
@@ -31,13 +31,19 @@ def write_tslist_into_txt(filelist_path,ts_file_list):
         fp.write('{0}'.format(str_content))
         fp.close()  
 
-def combine_ts_by_ffmpeg(tsvideoRoot, ts_file_list, saveFileDir, saveFilePath, log_print):
+def combine_ts_by_ffmpeg(tsvideoRoot,video_name_dir,ts_file_list, saveFileDir, saveFilePath, log_print):
     # tsvideoRoot = tsvideoRoot.replace('/','\\')
     # tsFileDir = tsFileDir.replace('/','\\')
-    saveFilePath = saveFilePath.replace('/','\\')
+    # saveFilePath = saveFilePath.replace('/','\\')
+    # 合并的所有 .ts 文件时存储组合列表的 txt 文件
+    filelist_path = '{0}/{1}__{2}'.format(saveFileDir,video_name_dir,filelist_name)
+    if os.path.exists(filelist_path):
+        os.remove(filelist_path)
+    
     # drive 参数是设定的输出的磁盘
     drive_name = tsvideoRoot[0] # 输出的盘符就是当前工程所在的盘符
 
+    # 删除旧文件（避免 ffmpeg 发现已存在相同文件时会在终端发出询问请求是否覆盖）
     if not os.path.exists(saveFileDir):
         os.makedirs(saveFileDir)
     if os.path.exists(saveFilePath):
@@ -48,15 +54,10 @@ def combine_ts_by_ffmpeg(tsvideoRoot, ts_file_list, saveFileDir, saveFilePath, l
     # ts_file_list = [i for i in ts_dir_file_list if sourceFormat in i]
     # ts_file_list = bubbleSortTsFile(ts_file_list)
     log_print('准备合并的文件列表----------------------------')
-    # 对 .ts 文件列表进行排序，确保按照从小到大 1.ts,2.ts,3.ts,.. 的规则有序排列，否则会造成重组视频发生混乱（重组视频会按照该列表的顺序把视频依次重组）
-    ts_file_name_list = [str(i).replace(f'{tsvideoRoot}/','') for i in ts_file_list]
-    log_print(f'ts_file_name_list：\n{ts_file_name_list}')
-    ts_file_name_list = bubbleSortTsFile(ts_file_name_list)
-    ts_file_list = [f'{tsvideoRoot}/{i}' for i in ts_file_name_list] # 为 ts_file_list 参数附上重新排序后的新数组
-    log_print(f'ts_file_list\n{ts_file_list}')
+    log_print(f'ts_file_list: \n{ts_file_list}')
 
     # 把要合并的所有 .ts 文件都预先排列好的写入到一个 txt 文件中
-    filelist_path = '{0}/{1}'.format(saveFileDir,filelist_name)
+    # filelist_path = '{0}/{1}__{2}'.format(saveFileDir,video_name_dir,filelist_name)
     log_print('把要合并的所有 .ts 文件都预先排列好的写入到一个 txt 文件中----------------------------')
     log_print(filelist_path)
     write_tslist_into_txt(filelist_path,ts_file_list)
