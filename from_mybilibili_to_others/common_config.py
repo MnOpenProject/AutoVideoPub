@@ -5,6 +5,10 @@ import os
 # （无头模式：即启动自动化脚本时，不会弹出浏览器显示当前代码的操作，而是在后台静默操作，是不可见的）
 edge_driver_headless = False
 
+# 请求B站稿件视频数据列表时，可指定请求页码
+# （列表是分页的，每页10条数据，为了方便根据B站稿件页来确定当前查询的数据，每页请求的数据量与其保持一致）
+video_request_all_page = True # 该开关设置为 True 时会逐页查询所有页码的数据,设置为 False 时，在 coolect_aid_data.py 里请求数据时，便会只查询 video_data_request_page_num 变量控制的页码的数据
+video_data_request_page_num = 1
 # 重新处理视频时，ffmpeg 分解视频为 .ts 切片文件时，设定的一个 .ts 文件的时长（单位：秒）
 video_ts_unit_long_s = 1
 # 重新处理视频时，需要选取的视频的时间范围 '需要减去的开头时长,需要减去的结尾时长'
@@ -75,6 +79,10 @@ video_new_dir = f'{__CURPATH__}/video_new_mp4'
 
 # 每次请求 aid 数据时，会把所有请求的视频的 title 都记录到这个目录下
 request_all_video_remember_dir = f'{__CURPATH__}/request_video_all'
+# 每次请求 aid 数据时，会把所有请求的视频的 title 都记录到这个文件里
+request_remember_txt_name = 'request_remember'
+# 每次请求 aid 数据时，会把所有请求的视频的 其他详细数据(比如 描述、动态等) 都记录到这个文件里，方便后面直接获取对应视频的详细数据
+request_remember_data_name = 'request_data_remember'
 # 每次请求 aid 数据时，也会把所有的视频的相关数据整理成一份配置（json 格式），存储到该目录下，然后在重新处理视频时(掐头去尾这类操作)，会从这里读取相应的配置参数
 video_redeal_config_dir = f'{__CURPATH__}/video_redeal_config'
 

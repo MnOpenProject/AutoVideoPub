@@ -2,7 +2,7 @@
 from globalvars import __ROOTPATH__
 import os,requests,progressbar,threadpool,json
 from datetime import datetime
-from .common_config import bilibili_request_headers
+from .common_config import bilibili_request_headers,video_request_all_page,video_data_request_page_num
 from .common_util import write_request_remember_txt,write_redeal_config_txt,get_video_name_by_title,is_in_exclude_txt,read_blibli_cookie_from_txt
 
 my_request_headers = bilibili_request_headers
@@ -27,9 +27,9 @@ def collect_aid_data():
     redeal_json_list = []
     # cur_page_data_count = 0 # 当前请求的数据量（当请求数据量小于 page_size 时，就说明这是最后一页了，如果当前请求数量为0，则说明上一页是最后一页）
     continue_request_data = True
-    page_num = 1 # 页码
+    page_num = 1 if video_request_all_page else video_data_request_page_num # 页码
     page_size = 10 # 一页的最大数据量
-    # 请求稿件分页列表        
+    # 请求稿件分页列表
     headers=my_request_headers
     headers['Cookie'] = read_cookie_from_txt()
     
@@ -43,15 +43,17 @@ def collect_aid_data():
         # 当前请求的数据量（当请求数据量小于 page_size 时，就说明这是最后一页了，如果当前请求数量为0，则说明上一页是最后一页）
         cur_page_data_count = len(arc_audits)
         print(f'正在请求数据：第 [{page_num}] 页')
-        if not isinstance(arc_audits,list) or cur_page_data_count < page_size or cur_page_data_count == 0:
-            # 若到了最后一页，则终止循环
+        # 若关闭请求所有页 或者 到了最后一页，则终止循环
+        if not video_request_all_page or (not isinstance(arc_audits,list) or cur_page_data_count < page_size or cur_page_data_count == 0):
             continue_request_data = False
         if cur_page_data_count > 0:
             for arc_item in arc_audits:
                 aid_data_item = {
                     'aid': str(arc_item['Archive']['aid']),
                     'title': get_video_name_by_title(arc_item['Archive']['title']),
-                    'datetime': timestamp2datetime(arc_item['Archive']['ptime'])
+                    'datetime': timestamp2datetime(arc_item['Archive']['ptime']),
+                    'desc': str(arc_item['Archive']['desc']),
+                    'dynamic': str(arc_item['Archive']['desc'])
                 }
                 # 排除 title 相同的视频资源
                 find_list = [i for i in aid_data if i['title'] == aid_data_item['title']]
@@ -70,7 +72,7 @@ def collect_aid_data():
                     redeal_json_list.append(redeal_json_item)
             page_num +=1
     # 把请求到的所有视频的title都记录到文本中，便于查看
-    write_request_remember_txt(title_list)
+    write_request_remember_txt(title_list,aid_data)
     write_redeal_config_txt(redeal_json_list)
     print(f'收集到的数据：\n{aid_data}')
     # 把收集到 aid 倒过来排序（因为请求的方式是从第1页开始请求的，得到的数据是 新到旧 的顺序排序的，但是我要的是 旧视频到最新视频 的顺序进行排序）

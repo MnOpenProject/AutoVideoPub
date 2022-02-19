@@ -1,6 +1,6 @@
 from time import sleep
 from datetime import datetime
-from .common_config import __CURPATH__,request_all_video_remember_dir,video_redeal_config_dir,video_download_exclude_txt,video_upload_menu_dir,personal_info_py_name,personal_info_path,cookie_txt_path,bilibili_request_headers,cookie_xiaohongshu_txt_path,xiaohongshu_request_headers,logs_out_dir,download_file_dir,covert_file_dir,tsfiles_root_dir,video_new_dir
+from .common_config import __CURPATH__,request_all_video_remember_dir,video_redeal_config_dir,video_download_exclude_txt,video_upload_menu_dir,personal_info_py_name,personal_info_path,cookie_txt_path,bilibili_request_headers,cookie_xiaohongshu_txt_path,xiaohongshu_request_headers,logs_out_dir,download_file_dir,covert_file_dir,tsfiles_root_dir,video_new_dir,request_remember_txt_name,request_remember_data_name
 import eventlet,os,importlib
 import ffmpy3,json,subprocess,shutil,requests
 
@@ -315,9 +315,18 @@ def write_data_list_into_txt(data_list,txt_dir,txt_name,rm_old=True,is_had_conte
         fp.close()
 
 # 每次请求 aid 数据时，会把所有请求的视频的 title 都记录到这个目录下
-request_remember_txt_name = 'request_remember'
-def write_request_remember_txt(video_title_list):
+def write_request_remember_txt(video_title_list,aid_data):
+    # 把视频标题记录到文本
     write_data_list_into_txt(video_title_list,request_all_video_remember_dir,request_remember_txt_name)
+    # 记录视频详细数据到文本（每一行为 json 格式字符串）
+    # aid_data,request_remember_data_name
+    jsonstr_list = [json.dumps(i,ensure_ascii=False) for i in aid_data]
+    write_data_list_into_txt(jsonstr_list,request_all_video_remember_dir,request_remember_data_name)
+
+# 读取视频的详细信息（比如 描述、动态等）
+def read_video_detail_data(video_title):
+    file_path = f'{request_all_video_remember_dir}/{request_remember_data_name}.txt'
+    return [json.loads(line.replace('\r','').replace('\n','')) for line in open(file_path,encoding='utf-8') if json.loads(line.replace('\r','').replace('\n',''))['title'] == video_title]
 
 # 每次请求 aid 数据时，也会把所有的视频的相关数据整理成一份配置（json 格式），存储到该目录下，然后在重新处理视频时(掐头去尾这类操作)，会从这里读取相应的配置参数
 def write_redeal_config_txt(video_json_list):
@@ -427,11 +436,15 @@ def create_upload_video_menu(txt_name):
     # （如果其中的内容为空，则上传时会默认使用默认的规则进行填写，具体规则需要在上传脚本里查看对应的注释）
     upload_json_list = []
     for v_title in upload_video_title_list:  #男士烫发[话题]# 
+        # 读取视频的详细数据，若使用这不修改该文本，那上传视频的时候就会使用到这里默认设置的来自B站上发布视频的信息
+        v_data = read_video_detail_data(v_title)
+        dynamic_str = '' if str(v_data['dynamic']).replace(' ','') == '' else f" ----- {v_data['dynamic']}"
+        upload_desc = '{0}{1}'.format(v_data['desc'],dynamic_str)
         v_item = {
             'title': v_title, # 下载视频时保存的title
-            'upload_title': '', # 上传时，[标题栏]里填写的内容（需使用者自行编写，若为空则使用默认规则填写）
+            'upload_title': v_data['title'], # 上传时，[标题栏]里填写的内容（需使用者自行编写，若为空则使用默认规则填写）
             'upload_topic': '', # 上传时，[描述栏]里最前面#标注的[话题]（需使用者自行编写，只需要写话题文字即可，若多个话题，用英文逗号隔开即可，比如 搞笑,动画,...，若为空则使用默认规则填写）
-            'upload_desc': '' # 上传时，[描述栏]里填写的内容（需使用者自行编写，若为空则使用默认规则填写）
+            'upload_desc':  upload_desc # 上传时，[描述栏]里填写的内容（需使用者自行编写，若为空则使用默认规则填写）
         }
         upload_json_list.append(json.dumps(v_item,ensure_ascii=False))
     # 倒序排列一下(这样可以使得上传视频时，默认从最早的一期视频开始上传)
