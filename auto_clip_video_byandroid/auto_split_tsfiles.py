@@ -1,6 +1,9 @@
 from globalvars import __ROOTPATH__
 from .video_split_tsfiles_by_ffmpeg import video_split_tsfiles_by_ffmpeg
-import importlib
+
+# 控制分解成 .ts 切片文件每一个切片文件的最大时长（单位：秒）
+# 误差1秒，即 分解出来的有的 .ts 切片文件时长会相比设定的值少1秒，如果设置 1 秒，那么实际上分解出的有的 .ts 切片文件时长会试 0 秒，但经测试，这并不会对合并造成影响，反而可以让自动截取视频重组更精确
+video_ts_unit_long_s = 1
 
 # @param rangstr: 范围字符串参数(格式如 '1:16')
 # @param str_len: 控制序号字符串的长度，不足会自动补零，如果这个参数不写，会默认保持最大值的字符串长度，不足自动补零
@@ -48,7 +51,7 @@ def split_video():
             video_file_name = f'{cfg["second_name"]}_{episode}'
             video_format = video_file_Format
             tsfiles_out_dir = f'{ts_file_root_dir}/tsfiles'
-            ts_unit_long_s=3
+            ts_unit_long_s=video_ts_unit_long_s
             video_split_tsfiles_by_ffmpeg(ts_file_root_dir,video_dir,video_file_name,video_format,tsfiles_out_dir,ts_unit_long_s)
 
 # 这个视频分解功能目前就是为了开源项目而做的，这里没有实际运用

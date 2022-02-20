@@ -5,14 +5,8 @@ from .auto_upload_video_to_blibli import main_func as upload_main_func,start_mkd
 from .move_video_to_mobile_storage import main_func as move_video_main_func
 from .auto_split_tsfiles import main_func as split_video_main_func
 from .auto_video_collection import main_func as video_collection_main_func
-
-# 判定是否为纯整数字符串
-def is_int_str(str):
-    try:
-        int(str)
-        return True
-    except:
-        return False
+from .config.dir_config import video_collection_prefix,video_transition_prefix
+from .common.common_util import is_int_str,filter_listdir
 
 ''' 提供给外界调用的主入口函数 '''
 def main_func():
@@ -42,7 +36,19 @@ def main_func():
   video_upload_config_params = []
   upload_config_files_name = 'upload_config_files'
   # 读取所有的配置脚本名称
-  video_upload_config_list = os.listdir('{0}auto_clip_video_byandroid/config/{1}'.format(__ROOTPATH__,upload_config_files_name))
+  video_upload_config_list = filter_listdir(os.listdir('{0}auto_clip_video_byandroid/config/{1}'.format(__ROOTPATH__,upload_config_files_name)))
+  # ----------- 根据选项过滤对应的视频类型的配置文件目录
+  if user_selected in '1,4,7':
+    # 【视频分段剪辑、视频分解】
+    # 排除过场视频、集锦视频
+    video_upload_config_list = [i for i in video_upload_config_list if not i[:len(video_transition_prefix)] == video_transition_prefix and not i[:len(video_collection_prefix)] == video_collection_prefix]
+  elif user_selected == '3':
+    # 自动上传，排除过场视频
+    video_upload_config_list = [i for i in video_upload_config_list if not i[:len(video_transition_prefix)] == video_transition_prefix]
+  elif user_selected == '8':
+    # 集锦制作，只显示集锦视频目录
+    video_upload_config_list = [i for i in video_upload_config_list if i[:len(video_collection_prefix)] == video_collection_prefix]
+  # ----------------------------------------------------------------
   video_upload_config_list_len = len(video_upload_config_list)
   # 根据文件名称，动态引入脚本
   idx = 1

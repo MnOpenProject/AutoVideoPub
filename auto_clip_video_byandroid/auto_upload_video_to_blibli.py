@@ -31,26 +31,22 @@
 from appium.webdriver.common.appiumby import AppiumBy
 from globalvars import __ROOTPATH__
 from appium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+# from selenium.webdriver.common.by import By
+# from selenium.webdriver.support.ui import WebDriverWait
+# from selenium.webdriver.support import expected_conditions as EC
 # TouchAction 已经过时了，用 drive.xxx 是最新的方案，其中封装的就是 W3C 方案
 # TouchAction 使用参考：https://www.cnblogs.com/liuhui0308/p/12033199.html#_lab2_0_2
 # from appium.webdriver.common.touch_action import TouchAction
 from time import sleep
-from datetime import datetime
-import os
-import json
-import importlib
-import eventlet
+import os,json,importlib,eventlet,shutil
 from PIL import Image
-
+from .config.dir_config import video_action_dir
 from .config.connection_config import config_server, config_desired_caps_bijian_app
-from .auto_combine_video import del_files, video_root_path_name
+from .auto_combine_video import video_root_path_name
 from .edit_action.insert_visual_role import start_create_by_virsual_role_channel
 from .edit_pubcover_action.main import main_func as edit_pubcover
-from .config.connection_config import out_log_file
 from .common.swipe_util import swipeDown
+from .common.common_util import isset,is_int_str,ask_for_selection,common_log_print,filter_listdir
 
 config_desired_caps = config_desired_caps_bijian_app
 
@@ -87,38 +83,9 @@ def tail_call_optimized(func):
 ''' ======================== 无限递归的解决方案 end ========================== '''
 
 # 自定义的 log 输出方法
-cur_timestamp = str(datetime.now().timestamp()).replace('.','')
 def log_print(str_content):
-    # 在终端打印
-    print(str_content)
-    if out_log_file:
-        # 输出到日志文件
-        logs_dir = '{0}auto_clip_video_byandroid/logs'.format(__ROOTPATH__)
-        if not os.path.exists(logs_dir):
-            os.makedirs(logs_dir)
-        # _log 前面改成当前的脚本文件名称
-        f_path = '{0}/auto_upload_video_to_blibli_log_{1}.log'.format(logs_dir,cur_timestamp)
-        # 写入文本
-        fp = open(f_path,"a",encoding="utf-8")
-        fp.write('{0}\n'.format(str_content))
-        fp.close()
-
-# 判断变量是否已定义
-def isset(v):
-    try:
-        type (eval(v))
-    except:
-        return False
-    else:
-        return True
-
-# 判定是否为纯整数字符串
-def is_int_str(str):
-    try:
-        int(str)
-        return True
-    except:
-        return False
+    cur_py_name = 'auto_upload_video_to_blibli'
+    common_log_print(str_content,cur_py_name)
 
 # @param rangstr: 范围字符串参数(格式如 '1:16')
 # @param str_len: 控制序号字符串的长度，不足会自动补零，如果这个参数不写，会默认保持最大值的字符串长度，不足自动补零
@@ -170,7 +137,7 @@ def connnect_android_device():
     global server
     global desired_caps
     global driver
-    global wait
+    # global wait
 
     # appium服务监听地址
     server = config_server
@@ -178,7 +145,7 @@ def connnect_android_device():
     desired_caps = config_desired_caps
     # 驱动
     driver = webdriver.Remote(server, desired_caps)
-    wait = WebDriverWait(driver, 15)
+    # wait = WebDriverWait(driver, 15)
 
 # 读取已上传的视频记录文件，并判定当前视频是否已经上传过
 # upload_video_file_name_full 是一个分段视频文件的完成名称(可包含扩展名)，如 silliconvalley1_01_01.mp4
@@ -247,7 +214,8 @@ def close_last_edit_dialog():
     # 判定是否有提示弹窗 <已恢复上次编辑的草稿，是否继续编辑>
     last_edit_dialog = None
     try:
-        last_edit_dialog = wait.until(EC.presence_of_element_located((By.ID, "{}ll_content".format(elementIdPrefix))))
+        # last_edit_dialog = wait.until(EC.presence_of_element_located((By.ID, "{}ll_content".format(elementIdPrefix))))
+        last_edit_dialog = driver.find_element(AppiumBy.ID, "{}ll_content".format(elementIdPrefix))
         log_print('----- 发现弹窗，即将关闭')
     except:
         last_edit_dialog = None
@@ -1258,10 +1226,106 @@ def mkdir_full_video_folder():
 
 # =================== 生成放置 完整 视频文件的目录 end =============
 
+# 初始化检查一些必要的目录或文件是否存在（不存在则会自动创建）
+def check_floder_or_file():
+    # 检查 video_action/ 目录下是否存在当前所需的脚本，若不存在则自动创建
+    check_video_action_script()
+
+# 检查 video_action/ 目录下是否存在当前所需的脚本，若不存在则自动创建
+def check_video_action_script():
+    v1th_name = video_first_name
+    v2th_name = video_second_name
+    log_print('检查 video_action/ 目录下是否存在当前所需的脚本，若不存在则自动创建')
+    # 检查 video_action/ 目录是否存在
+    if not os.path.exists(video_action_dir):
+        os.makedirs(video_action_dir)
+    # 检查视频一级名称对应的目录是否存在
+    v1th_floder_dir = f'{video_action_dir}/{v1th_name}'
+    if not os.path.exists(v1th_floder_dir):
+        os.makedirs(v1th_floder_dir)
+    
+    # 检查视频二级名称对应的自动操作脚本是否存在
+    v2th_script_path = f'{v1th_floder_dir}/{v2th_name}.py'
+    if not os.path.exists(v2th_script_path):
+        # 若不存在，则终端询问（创建空函数脚本，还是从已有的脚本中进行复制）
+        log_print(f'\n！！！ 当前缺失针对当前视频的特殊剪辑操作脚本：{v2th_script_path}')
+        hint_options = [
+            '[1] - 创建一个空函数体的脚本',
+            '[2] - 选择一个已有脚本中进行复制'
+        ]
+        selection = ask_for_selection(hint_options,log_print)
+        if selection == '1':
+            create_emptyfunc_actionpy(v2th_script_path)
+        else:
+            select_py_to_copy(v2th_script_path)
+
+def create_emptyfunc_actionpy(py_path):
+    # 创建一份空函数的 video_action 脚本
+
+    # 空函数脚本代码配置
+    str_content = "from appium.webdriver.common.appiumby import AppiumBy\n"
+    str_content = str_content + "from auto_clip_video_byandroid.common.ffmpeg_util import get_duration_from_ffmpeg\n"
+    str_content = str_content + "\n"
+    str_content = str_content + "def edit_video_action(log_print,driver,force_sleep,video_show_1th_name,video_show_2th_name,elementIdPrefix,video_show_file,editor_tool_audio_import_position=None,editor_tool_paster_position=None,video_show_file_path=None):\n"
+    
+    str_content = str_content + "    # 获取视频文件的时长\n"
+    str_content = str_content + "    file_path = video_show_file_path\n"
+    str_content = str_content + "    video_file_duration = get_duration_from_ffmpeg(file_path)\n"
+    str_content = str_content + r"    log_print(f'video_file_duration = {video_file_duration}')" + "\n"
+    str_content = str_content + "    # 四舍五入并取整数（去除带 .0 的小数点部分）\n"
+    str_content = str_content + "    video_file_duration = int(round(float(video_file_duration),0))\n"
+    str_content = str_content + "    video_long_sec = video_file_duration + 60 # 当前一个视频的总时长(单位：秒) 多加 60 秒是确保视频能够滑动到最右侧（即视频的末尾）\n"
+    str_content = str_content + r"    log_print('\n当前视频时长：{}秒'.format(video_long_sec))" + "\n"
+    
+    str_content = str_content + "    # [22] - 点击按钮 <导出> 切换到视频导出发布画面\n"
+    str_content = str_content + "    export_btn = driver.find_element(AppiumBy.ID, '{}tv_export'.format(elementIdPrefix))\n"
+    str_content = str_content + "    export_btn.click()\n"
+    str_content = str_content + r"    log_print('\n---------------- 点击<导出>，切换到<发布>画面，请等待片刻，待视频导出完成后，开始填写发布信息 ---------------\n')" + "\n"
+    str_content = str_content + "    # 经过测试，导出视频的时候，1秒大约可以导出 7秒时长的视频，所以等待导出完成的总时间计算如下\n"
+    str_content = str_content + "    wait_s = video_long_sec / 7\n"
+    str_content = str_content + "    force_sleep(wait_s)\n"
+    # 写入文本
+    fpath = py_path
+    fp = open(fpath,'w',encoding='utf-8')
+    fp.write(str_content)
+    fp.close()
+
+def select_py_to_copy(v2th_script_path):
+    # 从已有 video_action 脚本中进行复制
+
+    # 收集当前所有的已存在的 video_action 脚本
+    video_action_py_simple_name_list = [] # 用于方便提示的 脚本简称 集合
+    video_action_py_list = [] # 实际需要使用的 脚本绝对路径
+    video_action_1th_dir_list = filter_listdir(os.listdir(video_action_dir))
+    if len(video_action_1th_dir_list) < 1:
+        # 若没有任何脚本，则默认创建一个空函数脚本
+        log_print('！！！抱歉！！！ --- 目前不存在任何 video_action 脚本可选择，现在已创建了一个空函数脚本')
+        create_emptyfunc_actionpy(v2th_script_path)
+        return
+    for act_1th_floder in video_action_1th_dir_list:
+        act_1th_path = f'{video_action_dir}/{act_1th_floder}'
+        act_py_list = filter_listdir(os.listdir(act_1th_path))
+        for act_py in act_py_list:
+            act_py_path = f'{act_1th_path}/{act_py}'
+            cur_len = len(video_action_py_simple_name_list) + 1
+            video_action_py_simple_name_list.append(f'[{cur_len}] - {act_1th_floder}/{act_py}')
+            video_action_py_list.append(act_py_path)
+    # 询问选项
+    selection = ask_for_selection(video_action_py_simple_name_list,log_print)
+    
+    # 进行复制
+    copy_source_path = video_action_py_list[int(selection)-1]
+    copy_target_path = v2th_script_path
+    shutil.copyfile(copy_source_path,copy_target_path)
+
 def start_program():
     global elementIdPrefix
     # 初始化创建需要的目录
     initAllDir()
+
+    # 初始化检查一些必要的目录或文件是否存在
+    check_floder_or_file()
+
     # 上传视频之前，选择执行的具体操作
     log_print('\n----- 请选择操作类型（默认选项：[1]）： -----\n')
     hint_options = [
@@ -1358,12 +1422,17 @@ def main_func(upload_config_module):
     global video_upload_config_list
     global action_type_selected
     global create_videw_type_selected
+    global video_first_name
+    global video_second_name
     
     upload_config_module_remember = upload_config_module
     mobile_storage_folder = upload_config_module.mobile_storage_folder
     video_upload_config_list = upload_config_module.video_upload_config_list
     action_type_selected = {'val':None}
     create_videw_type_selected = {'val':None}
+    video_first_name = upload_config_module.first_name
+    video_second_name = upload_config_module.second_name
+
 
     start_program()
 
