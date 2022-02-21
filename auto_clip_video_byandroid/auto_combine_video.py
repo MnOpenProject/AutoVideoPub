@@ -36,6 +36,11 @@ from .config.connection_config import out_log_file
 from .combine_ts_by_ffmpeg import combine_ts_by_ffmpeg,combine_ts_by_ffmpeg2
 from .common.ffmpeg_util import get_duration_from_ffmpeg
 
+# 经测试下来，即使 .ts 切片文件时长只有1秒，还是没法精确剪辑，所以这里需要添加一个误差值
+# （如果使用者发现自己分段视频偏差较大，请自行修改该偏差值，后续若有好的方案，我会进行优化）
+# （这个误差值，很有可能会因为 .ts 切片文件的时长而不同，现在设置的值对应的是 .ts 切片文件时长为 1 秒）
+offset_val = 5 # 误差值（单位：秒）
+
 ''' ======================== 无限递归的解决方案 start ========================== '''
 # 这个值的大小取决你自己，最好适中即可，执行完递归再降低，毕竟递归深度太大，如果是其他未知的操作引起，可能会造成内存溢出
 import sys
@@ -228,6 +233,8 @@ def combine_ts_group_by_timeval(paragraph_time_list,ts_file_root_dir,ts_file_vid
         start_m = int(start_time_list[1]) # 分
         start_s = int(start_time_list[2]) # 秒
         start_total_sec = start_h * 60 * 60 + start_m * 60 + start_s # 开始时刻转换为 秒级 数值
+        # 经测试下来，即使 .ts 切片文件时长只有1秒，还是没法精确，所以这里需要添加一个误差值
+        start_total_sec = start_total_sec + offset_val
         # 结束时刻
         end_time_list = time_list[1].split(':')
         end_h = int(end_time_list[0]) # 时
