@@ -107,9 +107,13 @@
     * （new3）【视频上传配置参数中增加参数 -- 转载视频来源】：upload_config_files\ 目录下配置文件中的 video_file_config_list 里新增参数 'video_source': 'xxx.xxx.xxx'，之前没有使用过转载功能，这次使用转载功能时，发现被要求必须填写视频来源，所以这次补充了该功能，在自动上传的时候，若选择的类型是'转载'，则会自动往'来源'一栏里填写 'video_source' 的参数值
 
 ## 新模块发布（new） 
-* 
+* （1）
     * 【from_mybilibili_to_others】模块可实现 -- 下载自己<B站 稿件管理 已审核>的投稿视频，并自动处理后，自动上传到自己账号登录的其他视频平台上
     * * 具体说明请查看模块下的说明文件： [from_mybilibili_to_others/README.md](from_mybilibili_to_others/README.md)
+
+* （2）
+    * 【video_english_ocr】模块可实现 -- （美剧英语学习助手）分解视频为帧图，并对其提取英文字幕（详细说明请看其中的 README.md）
+    * * 具体说明请查看模块下的说明文件： [video_english_ocr/README.md](video_english_ocr/README.md)
 
 ## 附加说明
 * 

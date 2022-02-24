@@ -26,3 +26,8 @@ from_mybilibili_to_others/video_new_mp4
 from_mybilibili_to_others/personal_info.py
 from_mybilibili_to_others/b_cookie.txt
 from_mybilibili_to_others/xhs_cookie.txt
+
+# video_english_ocr
+video_english_ocr/video_frame_imgs
+video_english_ocr/video_frame_caption_imgs
+video_english_ocr/video_caption_words
