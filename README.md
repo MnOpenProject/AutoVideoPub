@@ -93,6 +93,11 @@
     *【特别说明】：更多功能，请自行研究，兴许实力强大的你会有更多好用的功能去实现
 
 ## 新增功能（new）
+* [【txt秒变英语单词教学视频 -- 效果展示】：https://www.bilibili.com/video/BV19b4y1H7wR/?vd_source=70eab574cc508f954057839eef5f52b6](https://www.bilibili.com/video/BV19b4y1H7wR/?vd_source=70eab574cc508f954057839eef5f52b6)
+    * 详细功能请看 /auto_create_eng_video_bypc 模块
+    * 【new！！！】“英文txt文档” 秒变 “英语单词教学视频”
+    * 该模块功能会自动从提供的 “英文txt文档” 中提取难点单词，并自动翻译后，整理成英文单词txt文档，最后根据单词txt文档生成完整的英语单词陪读视频，具体效果可查看上面给出的演示链接
+
 * 【视频说明链接】：https://www.bilibili.com/video/BV1334y117pw/
     * （new1）【视频集锦制作】：可以把本地已有的多个分段视频进行自由组合成一个完整的集锦视频(即 auto_clip_video_byandroid\video\ 目录下的视频文件)，并进行自动上传，这比单纯上传一个单一的分段视频更好些，使用者可以按程序的命名规则手动在 auto_clip_video_byandroid\video\ 目录下放置自己的过渡视频文件，如此可以让集锦视频有了过渡画面，避免不同的视频片段变换僵硬的问题
     * 使用说明：
